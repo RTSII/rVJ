@@ -1,76 +1,22 @@
+# rVJ: Immersive Audio-Visual Sync for DJ Sets
 
-# RVJ - A Lovable Video Editor
+rVJ (a play on "Rob's Video Jockey") is a web app for creating beat-synced visual experiences from your DJ sets. Upload an audio mix, add video clips or generated effects, and sync them to the rhythm for an epic, immersive output. Perfect for VJs, content creators, or party vibes.
 
-This is a simple video editor built with React, TypeScript, and Tailwind CSS using Lovable. It allows you to upload video and audio clips, arrange them on a timeline, and preview the result.
+## Features
+- **Audio Upload & Sync**: Load DJ sets and auto-detect beats for smart visual placement.
+- **Timeline Editing**: Drag-and-drop clips with optimized preview (handles large timelines without buffering issues).
+- **Visual Effects**: Generate or add effects that pulse to the music.
+- **Export**: Merge into a final video.
 
-## Project info
+## Getting Started
+1. Clone: `git clone https://github.com/RTSII/rVJ.git`
+2. Install: `npm install`
+3. Run: `npm start`
+4. Upload audio/clips and start syncing!
 
-**URL**: https://lovable.dev/projects/2354ee96-76e2-4cad-bbb0-7ea7041f961f
+## Roadmap
+- Buffering optimizations for massive timelines.
+- AI-generated effects.
+- Community contributions welcome!
 
-## How can I edit this code?
-
-There are several ways of editing your application.
-
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/2354ee96-76e2-4cad-bbb0-7ea7041f961f) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/2354ee96-76e2-4cad-bbb0-7ea7041f961f) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+Built with React, Redux, FFmpeg, and love for beats. 🚀
