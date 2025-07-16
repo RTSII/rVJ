@@ -166,6 +166,13 @@ const MediaLibrary = () => {
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors rounded flex items-center justify-center">
                     <Plus className="h-6 w-6 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
                   </div>
+                  
+                  {/* Buffer indicator for clips in timeline */}
+                  {bufferStates[clip.id] && (
+                    <div className="absolute top-1 right-1">
+                      <BufferIndicator clipId={clip.id} size="sm" showText={false} />
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
