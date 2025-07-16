@@ -180,10 +180,18 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   }),
   setZoomLevel: (zoomLevel) => set({ zoomLevel }),
   
-  setTimelineClips: (clips) => set({ 
-    timelineClips: clips,
-    clips: clips 
-  }),
+  setTimelineClips: (clips) => {
+    const firstClip = clips[0] || null;
+    set({ 
+      timelineClips: clips,
+      clips: clips,
+      // Always select the first clip when timeline order changes
+      selectedClip: firstClip,
+      selectedClipId: firstClip?.id || null,
+      currentTime: 0,
+      absoluteTimelinePosition: 0
+    });
+  },
   
   addClipToTimeline: (clip) => {
     const newClip: TimelineClip = {
