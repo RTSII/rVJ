@@ -37,7 +37,10 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
   useVideoSync(videoRef, audioRef);
   useAutoSelect();
   useAudioTimeSync(videoRef, audioRef); // Audio-driven timeline sync
-  useVideoTimeSync(videoRef); // NEW: Video-only timeline sync
+  useVideoTimeSync(videoRef); // Video-only timeline sync
+  
+  // Initialize buffer manager
+  const { getBufferState, preloadClip, memoryUsage, preloadedClipsCount } = useBufferManager(videoRef, audioRef);
   
   const { togglePlay, jumpToStart, jumpToEnd } = usePlaybackControls(videoRef, audioRef);
   const { getAbsoluteTimePosition, seekToAbsoluteTime, seekToTime } = useSeekControls(videoRef, audioRef);
@@ -53,6 +56,10 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
     videoRef,
     audioRef,
     getAbsoluteTimePosition,
+    getBufferState,
+    preloadClip,
+    memoryUsage,
+    preloadedClipsCount,
   };
 
   return (
