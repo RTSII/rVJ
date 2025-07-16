@@ -225,6 +225,25 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   setAbsoluteTimelinePosition: (absoluteTimelinePosition) => set({ absoluteTimelinePosition }),
   setTrimmingClipId: (trimmingClipId) => set({ trimmingClipId }),
   
+  // Buffer and transition actions
+  setBufferState: (clipId, bufferState) => set((state) => ({
+    bufferStates: { ...state.bufferStates, [clipId]: bufferState }
+  })),
+  
+  setErrorState: (clipId, error) => set((state) => ({
+    errorStates: { ...state.errorStates, [clipId]: error }
+  })),
+  
+  clearErrorState: (clipId) => set((state) => {
+    const newErrorStates = { ...state.errorStates };
+    delete newErrorStates[clipId];
+    return { errorStates: newErrorStates };
+  }),
+  
+  setTransitionState: (transitionState) => set({ transitionState }),
+  setIsBuffering: (isBuffering) => set({ isBuffering }),
+  setMemoryUsage: (memoryUsage) => set({ memoryUsage }),
+  
   resetToTimelineStart: () => {
     const firstClip = get().timelineClips[0] || null;
     set({
