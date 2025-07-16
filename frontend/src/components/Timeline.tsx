@@ -14,6 +14,7 @@ import {
   VideoTrack, 
   TimelineRuler 
 } from './timeline';
+import AudioLoadingIndicator from '@/components/AudioLoadingIndicator';
 
 const Timeline = () => {
   const timelineContainerRef = useRef<HTMLDivElement>(null);
