@@ -13,7 +13,7 @@ const MediaLibrary = () => {
   const audioInputRef = useRef<HTMLInputElement>(null);
   const dragItem = useRef<number | null>(null);
   const dragOverItem = useRef<number | null>(null);
-  const { addClipToTimeline, loadAudio, setSelectedClip } = useEditorStore();
+  const { addClipToTimeline, loadAudio, setSelectedClip, bufferStates } = useEditorStore();
 
   const generateThumbnail = (clip: MediaClip): Promise<string> => {
     return new Promise((resolve) => {
