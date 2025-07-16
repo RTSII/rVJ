@@ -67,6 +67,8 @@ const VideoPreview = () => {
         }, 200);
       } else {
         // Update current time relative to clip start
+        const relativeTime = Math.max(0, videoCurrentTime - clipStartTime);
+        setCurrentTime(relativeTime);
       }
     }
   };
