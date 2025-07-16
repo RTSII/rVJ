@@ -4,6 +4,7 @@ import { UploadCloud, Plus, Music, Video } from "lucide-react";
 import React, { useState, useRef, useEffect } from "react";
 import { useEditorStore } from "@/lib/store";
 import { MediaClip } from "@/types";
+import BufferIndicator from "@/components/BufferIndicator";
 
 const MediaLibrary = () => {
   const [mediaClips, setMediaClips] = useState<MediaClip[]>([]);
