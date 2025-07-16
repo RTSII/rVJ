@@ -76,6 +76,14 @@ interface EditorActions {
   resetToTimelineStart: () => void;
   setTrimmingClipId: (id: string | null) => void;
   
+  // Buffer and transition actions
+  setBufferState: (clipId: string, bufferState: BufferState) => void;
+  setErrorState: (clipId: string, error: string) => void;
+  clearErrorState: (clipId: string) => void;
+  setTransitionState: (transitionState: TransitionState) => void;
+  setIsBuffering: (isBuffering: boolean) => void;
+  setMemoryUsage: (memoryUsage: number) => void;
+  
   loadProject: (clips: TimelineClip[]) => void;
   clearTimeline: () => void;
 }
