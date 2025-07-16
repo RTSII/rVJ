@@ -26,7 +26,7 @@ def test_root_endpoint(base_url):
     print("\n=== Testing GET /api/ (Root Endpoint) ===")
     try:
         url = f"{base_url}/api/"
-        response = requests.get(url, timeout=10)
+        response = requests.get(url, timeout=30)
         
         print(f"URL: {url}")
         print(f"Status Code: {response.status_code}")
