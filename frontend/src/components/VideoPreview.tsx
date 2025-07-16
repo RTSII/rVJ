@@ -48,23 +48,20 @@ const VideoPreview = () => {
   useKeyboardShortcuts();
 
   const handleTimeUpdate = () => {
-    if (videoRef.current && selectedClip && !isTransitioning.current) {
+    if (videoRef.current && selectedClip && !isTransitioningRef.current && !isTransitioning) {
       const videoCurrentTime = videoRef.current.currentTime;
       const clipStartTime = selectedClip.startTime ?? 0;
       const clipEndTime = selectedClip.endTime ?? videoRef.current.duration;
 
       if (clipEndTime && videoCurrentTime >= clipEndTime - 0.02) {
-        console.log("🎬 TIME-UPDATE: Clip reached end, triggering seamless transition");
-        isTransitioning.current = true;
+        console.log("🎬 TIME-UPDATE: Clip reached end, triggering transition");
+        isTransitioningRef.current = true;
         
-        if (transitionTimeoutRef.current) {
-          clearTimeout(transitionTimeoutRef.current);
-        }
+        // Use the new transition manager for smooth transitions
+        handleAutoTransition();
         
-        handleClipEnded();
-        
-        transitionTimeoutRef.current = setTimeout(() => {
-          isTransitioning.current = false;
+        setTimeout(() => {
+          isTransitioningRef.current = false;
         }, 500);
       } else {
         const relativeTime = Math.max(0, videoCurrentTime - clipStartTime);
@@ -100,8 +97,8 @@ const VideoPreview = () => {
 
   const handleVideoEnded = () => {
     console.log("🎬 VIDEO-END: Video element ended event");
-    if (!isTransitioning.current) {
-      handleClipEnded();
+    if (!isTransitioningRef.current && !isTransitioning) {
+      handleAutoTransition();
     }
   };
 
