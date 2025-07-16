@@ -185,10 +185,35 @@ const VideoPreview = () => {
               onLoadedMetadata={handleLoadedMetadata}
               onEnded={handleVideoEnded}
               onClick={togglePlay}
-              preload="metadata"
+              preload="auto"
               playsInline
               muted={false}
             />
+            
+            {/* Buffer/Transition Indicators */}
+            {(isBuffering || isTransitioning || currentBufferState?.isBuffering) && (
+              <div className="absolute top-4 right-4 bg-black/70 rounded-lg p-2 text-white">
+                <div className="flex items-center gap-2">
+                  {isTransitioning && (
+                    <div className="text-sm">
+                      Transitioning... {transitionProgress.toFixed(0)}%
+                    </div>
+                  )}
+                  {selectedClip && (
+                    <BufferIndicator clipId={selectedClip.id} size="sm" />
+                  )}
+                </div>
+              </div>
+            )}
+            
+            {/* Memory Usage Indicator (Development) */}
+            {process.env.NODE_ENV === 'development' && (
+              <div className="absolute top-4 left-4 bg-black/70 rounded-lg p-2 text-white text-xs">
+                <div>Memory: {bufferMemoryUsage.toFixed(1)}MB</div>
+                <div>Preloaded: {preloadedClipsCount}</div>
+              </div>
+            )}
+            
             {shouldShowPlayButton && (
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <Button
