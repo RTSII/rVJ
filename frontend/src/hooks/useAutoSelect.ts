@@ -9,11 +9,15 @@ export const useAutoSelect = () => {
     resetToTimelineStart
   } = useEditorStore();
 
-  // Auto-select first clip when clips are added
+  // Auto-select first clip when clips are added or timeline changes
   useEffect(() => {
-    if (timelineClips.length > 0 && !selectedClip) {
-      console.log("🎯 AUTO-SELECT: Timeline has clips but no selection, triggering reset");
-      resetToTimelineStart();
+    if (timelineClips.length > 0) {
+      const firstClip = timelineClips[0];
+      // Always select the first clip when timeline changes, unless the first clip is already selected
+      if (!selectedClip || selectedClip.id !== firstClip.id) {
+        console.log("🎯 AUTO-SELECT: Timeline changed, selecting first clip:", firstClip.id);
+        resetToTimelineStart();
+      }
     }
-  }, [timelineClips.length, selectedClip, resetToTimelineStart]);
+  }, [timelineClips, selectedClip, resetToTimelineStart]);
 };
