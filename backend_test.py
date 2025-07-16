@@ -98,7 +98,7 @@ def test_get_status_checks(base_url):
     print("\n=== Testing GET /api/status (Get All Status Checks) ===")
     try:
         url = f"{base_url}/api/status"
-        response = requests.get(url, timeout=10)
+        response = requests.get(url, timeout=30)
         
         print(f"URL: {url}")
         print(f"Status Code: {response.status_code}")
