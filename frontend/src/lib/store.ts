@@ -112,6 +112,18 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   absoluteTimelinePosition: 0,
   isAudioMaster: true,
   trimmingClipId: null,
+  
+  // Buffer and transition states
+  bufferStates: {},
+  errorStates: {},
+  transitionState: {
+    isTransitioning: false,
+    fromClip: null,
+    toClip: null,
+    progress: 0
+  },
+  isBuffering: false,
+  memoryUsage: 0,
 
   addClip: (clip) => {
     const newClip: TimelineClip = {
