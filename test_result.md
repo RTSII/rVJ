@@ -119,6 +119,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "Verified all backend API endpoints working correctly: GET /api/ (root endpoint), POST /api/status (create status check), GET /api/status (get all status checks). All endpoints return proper responses with correct data structures. Backend service running on supervisor. MongoDB connection working properly."
+      - working: true
+        agent: "testing"
+        comment: "Re-tested all backend API endpoints after timeout adjustments. All 3 endpoints working correctly: 1) GET /api/ returns proper 'Hello World' message, 2) POST /api/status successfully creates status checks with UUID, client_name, and timestamp, 3) GET /api/status returns list of status checks. Backend service stable on supervisor, MongoDB connection working properly. Updated backend_test.py with 30-second timeouts to handle network latency."
 
 frontend:
   - task: "Buffer Manager Implementation"
