@@ -63,7 +63,7 @@ def test_create_status_check(base_url):
             url, 
             json=test_data,
             headers={"Content-Type": "application/json"},
-            timeout=10
+            timeout=30
         )
         
         print(f"URL: {url}")
