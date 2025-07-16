@@ -53,16 +53,18 @@ const VideoPreview = () => {
       const clipStartTime = selectedClip.startTime ?? 0;
       const clipEndTime = selectedClip.endTime ?? videoRef.current.duration;
 
-      if (clipEndTime && videoCurrentTime >= clipEndTime - 0.02) {
-        console.log("🎬 TIME-UPDATE: Clip reached end, triggering transition");
+      // Check if we're approaching the end of the clip for seamless transition
+      if (clipEndTime && videoCurrentTime >= clipEndTime - 0.1) {
+        console.log("🎬 TIME-UPDATE: Clip reached end, triggering seamless transition");
         isTransitioningRef.current = true;
         
-        // Use the new transition manager for smooth transitions
+        // Use the transition manager for seamless clip changes
         handleAutoTransition();
         
+        // Reset transition flag after a short delay
         setTimeout(() => {
           isTransitioningRef.current = false;
-        }, 500);
+        }, 200);
       } else {
         const relativeTime = Math.max(0, videoCurrentTime - clipStartTime);
         setCurrentTime(relativeTime);
