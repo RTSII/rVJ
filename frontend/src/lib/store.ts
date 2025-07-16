@@ -278,5 +278,15 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     waveformData: [],
     waveform: [],
     audioMarkers: [],
+    bufferStates: {},
+    errorStates: {},
+    transitionState: {
+      isTransitioning: false,
+      fromClip: null,
+      toClip: null,
+      progress: 0
+    },
+    isBuffering: false,
+    memoryUsage: 0,
   }),
 }));
