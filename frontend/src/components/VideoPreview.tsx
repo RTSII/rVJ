@@ -115,19 +115,17 @@ const VideoPreview = () => {
       setClipDisplayDuration(clipDuration > 0 ? clipDuration : (videoRef.current.duration || 8));
       setCurrentTime(0);
 
-      if (!isTransitioning.current) {
+      if (!isTransitioningRef.current && !isTransitioning) {
         console.log("🎬 CLIP-CHANGE: Setting video time to clip start:", clipStartTime);
         videoRef.current.currentTime = clipStartTime;
       }
     }
-  }, [selectedClip?.id, selectedClip?.startTime, selectedClip?.endTime, setCurrentTime]);
+  }, [selectedClip?.id, selectedClip?.startTime, selectedClip?.endTime, setCurrentTime, isTransitioning]);
 
   // Cleanup timeout on unmount
   React.useEffect(() => {
     return () => {
-      if (transitionTimeoutRef.current) {
-        clearTimeout(transitionTimeoutRef.current);
-      }
+      isTransitioningRef.current = false;
     };
   }, []);
 
