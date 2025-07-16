@@ -166,8 +166,11 @@ const VideoPreview = () => {
   const currentClipIndex = selectedClip ? timelineClips.findIndex(c => c.id === selectedClip.id) + 1 : 0;
   const totalClips = timelineClips.length;
   const videoIsPlaying = videoRef.current ? !videoRef.current.paused : false;
-  const shouldShowPlayButton = !videoIsPlaying && !isTransitioning.current;
+  const shouldShowPlayButton = !videoIsPlaying && !isTransitioningRef.current && !isTransitioning;
   const progressPercentage = clipDisplayDuration > 0 ? Math.min(100, (currentTime / clipDisplayDuration) * 100) : 0;
+
+  // Get buffer state for current clip
+  const currentBufferState = selectedClip ? getBufferState(selectedClip.id) : null;
 
   return (
     <div ref={previewContainerRef} className="bg-card border border-border rounded-lg overflow-hidden grid grid-rows-[1fr_auto] h-full">
