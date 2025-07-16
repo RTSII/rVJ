@@ -117,8 +117,13 @@ const VideoPreview = () => {
       setClipDisplayDuration(clipDuration > 0 ? clipDuration : (videoRef.current.duration || 8));
       setCurrentTime(0);
 
+      // Only change video source if it's different and not transitioning
       if (!isTransitioningRef.current && !isTransitioning) {
         console.log("🎬 CLIP-CHANGE: Setting video time to clip start:", clipStartTime);
+        
+        if (videoRef.current.src !== selectedClip.src) {
+          videoRef.current.src = selectedClip.src;
+        }
         videoRef.current.currentTime = clipStartTime;
       }
     }
