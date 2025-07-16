@@ -242,6 +242,13 @@ const Timeline = () => {
       {audioSrc && <audio ref={audioRef} src={audioSrc} />}
       <TimelineControls handleExport={handleExport} />
       <CardContent className="p-2 pt-1 flex-1 min-h-0 overflow-hidden">
+        {/* Audio Loading Indicator */}
+        {audioFile && (
+          <div className="mb-2">
+            <AudioLoadingIndicator audioRef={audioRef} showDetailed={false} />
+          </div>
+        )}
+        
         {isExporting && (
           <div className="mb-1 space-y-1">
             <p className="text-xs text-muted-foreground text-center">Processing video, please wait...</p>
