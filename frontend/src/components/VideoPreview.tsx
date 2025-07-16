@@ -14,6 +14,7 @@ const VideoPreview = () => {
   const previewContainerRef = React.useRef<HTMLDivElement>(null);
   const {
     videoRef,
+    audioRef,
     togglePlay,
     jumpToStart,
     jumpToEnd,
@@ -30,12 +31,18 @@ const VideoPreview = () => {
     timelineClips,
     absoluteTimelinePosition,
     setAbsoluteTimelinePosition,
-    isAudioMaster
+    isAudioMaster,
+    transitionState,
+    isBuffering,
+    memoryUsage
   } = useEditorStore();
 
+  // Initialize buffer manager and transition manager
+  const { getBufferState, memoryUsage: bufferMemoryUsage, preloadedClipsCount } = useBufferManager(videoRef, audioRef);
+  const { transitionToClip, handleAutoTransition, isTransitioning, transitionProgress } = useTransitionManager(videoRef, audioRef);
+
   const [clipDisplayDuration, setClipDisplayDuration] = React.useState(0);
-  const isTransitioning = React.useRef(false);
-  const transitionTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+  const isTransitioningRef = React.useRef(false);
 
   // Enable keyboard shortcuts
   useKeyboardShortcuts();
