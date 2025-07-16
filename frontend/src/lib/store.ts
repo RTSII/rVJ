@@ -198,10 +198,21 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       ...clip,
       id: generateId(),
     };
-    set((state) => ({
-      clips: [...state.clips, newClip],
-      timelineClips: [...state.timelineClips, newClip],
-    }));
+    set((state) => {
+      const updatedClips = [...state.clips, newClip];
+      const updatedTimelineClips = [...state.timelineClips, newClip];
+      const firstClip = updatedTimelineClips[0] || null;
+      
+      return {
+        clips: updatedClips,
+        timelineClips: updatedTimelineClips,
+        // Always select the first clip (leftmost) when adding clips
+        selectedClip: firstClip,
+        selectedClipId: firstClip?.id || null,
+        currentTime: 0,
+        absoluteTimelinePosition: 0
+      };
+    });
   },
   
   loadAudio: async (file: File) => {
