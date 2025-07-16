@@ -5,6 +5,9 @@ import { Play, Pause, Rewind, FastForward, Expand } from "lucide-react";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { useEditor } from "@/context/EditorContext";
 import { useEditorStore } from "@/lib/store";
+import { useBufferManager } from "@/hooks/useBufferManager";
+import { useTransitionManager } from "@/hooks/useTransitionManager";
+import BufferIndicator from "@/components/BufferIndicator";
 import { toast } from "sonner";
 
 const VideoPreview = () => {
