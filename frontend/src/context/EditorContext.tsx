@@ -7,6 +7,7 @@ import { useSeekControls } from '@/hooks/useSeekControls';
 import { useClipTransition } from '@/hooks/useClipTransition';
 import { useAudioTimeSync } from '@/hooks/useAudioTimeSync';
 import { useVideoTimeSync } from '@/hooks/useVideoTimeSync';
+import { useBufferManager } from '@/hooks/useBufferManager';
 
 export type { MediaClip };
 
