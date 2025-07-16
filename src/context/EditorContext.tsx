@@ -1,4 +1,4 @@
-import React, { createContext, useContext, ReactNode, useRef } from 'react';
+import React, { createContext, useContext, ReactNode, useRef, useEffect } from 'react';
 import { MediaClip } from '@/types';
 import { useVideoSync } from '@/hooks/useVideoSync';
 import { useAutoSelect } from '@/hooks/useAutoSelect';
@@ -32,11 +32,18 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
   useVideoSync(videoRef, audioRef);
   useAutoSelect();
   useAudioTimeSync(videoRef, audioRef); // Audio-driven timeline sync
-  useVideoTimeSync(videoRef); // NEW: Video-only timeline sync
-  
+  useVideoTimeSync(videoRef); // Video-only timeline sync
+
   const { togglePlay, jumpToStart, jumpToEnd } = usePlaybackControls(videoRef, audioRef);
   const { getAbsoluteTimePosition, seekToAbsoluteTime, seekToTime } = useSeekControls(videoRef, audioRef);
-  const { handleClipEnded } = useClipTransition(videoRef, audioRef);
+  const { handleClipEnded, cleanup } = useClipTransition(videoRef, audioRef);
+
+  // Cleanup enhanced transitions on unmount
+  useEffect(() => {
+    return () => {
+      cleanup();
+    };
+  }, [cleanup]);
 
   const value = {
     togglePlay,

@@ -34,11 +34,100 @@ const VideoPreview = () => {
   const [clipDisplayDuration, setClipDisplayDuration] = React.useState(0);
   const [isBuffering, setIsBuffering] = React.useState(false);
   const isTransitioning = React.useRef(false);
-  const transitionTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+  const transitionTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Enable keyboard shortcuts and video preloading
+  // Enable keyboard shortcuts
   useKeyboardShortcuts();
-  const { isPreloaded } = useVideoPreloader(timelineClips, selectedClip?.id);
+  const { isPreloaded, getBufferHealth, forceBufferCheck } = useVideoPreloader(timelineClips, selectedClip?.id);
+  const [bufferHealth, setBufferHealth] = React.useState(0);
+  const [bufferStalled, setBufferStalled] = React.useState(false);
+  const lastBufferUpdate = React.useRef(Date.now());
+
+  // Monitor buffer health for current clip
+  React.useEffect(() => {
+    if (selectedClip) {
+      const health = getBufferHealth(selectedClip.id);
+      setBufferHealth(health);
+
+      // Force buffer check when clip changes
+      forceBufferCheck();
+    }
+  }, [selectedClip?.id, getBufferHealth, forceBufferCheck]);
+
+  // Enhanced buffering detection
+  React.useEffect(() => {
+    if (!videoRef.current || !selectedClip) return;
+
+    const video = videoRef.current;
+    let stallTimeout: ReturnType<typeof setTimeout>;
+
+    const handleWaiting = () => {
+      console.log("🎬 BUFFER: Video waiting/buffering for clip:", selectedClip.id);
+      setIsBuffering(true);
+      setBufferStalled(false);
+
+      // Set stall detection timeout
+      stallTimeout = setTimeout(() => {
+        console.warn("🎬 BUFFER: Video stalled for 3+ seconds");
+        setBufferStalled(true);
+        forceBufferCheck();
+      }, 3000);
+    };
+
+    const handleCanPlay = () => {
+      console.log("🎬 BUFFER: Video can play for clip:", selectedClip.id);
+      setIsBuffering(false);
+      setBufferStalled(false);
+      if (stallTimeout) clearTimeout(stallTimeout);
+      forceBufferCheck();
+    };
+
+    const handleCanPlayThrough = () => {
+      console.log("🎬 BUFFER: Video can play through for clip:", selectedClip.id);
+      setIsBuffering(false);
+      setBufferStalled(false);
+      if (stallTimeout) clearTimeout(stallTimeout);
+      forceBufferCheck();
+    };
+
+    const handleProgress = () => {
+      // Throttle buffer health updates
+      const now = Date.now();
+      if (now - lastBufferUpdate.current > 1000) {
+        forceBufferCheck();
+        lastBufferUpdate.current = now;
+      }
+    };
+
+    const handleSeeking = () => {
+      console.log("🎬 BUFFER: Video seeking");
+      setIsBuffering(true);
+    };
+
+    const handleSeeked = () => {
+      console.log("🎬 BUFFER: Video seek complete");
+      setIsBuffering(false);
+      forceBufferCheck();
+    };
+
+    // Enhanced event listeners for better buffer monitoring
+    video.addEventListener('waiting', handleWaiting);
+    video.addEventListener('canplay', handleCanPlay);
+    video.addEventListener('canplaythrough', handleCanPlayThrough);
+    video.addEventListener('progress', handleProgress);
+    video.addEventListener('seeking', handleSeeking);
+    video.addEventListener('seeked', handleSeeked);
+
+    return () => {
+      if (stallTimeout) clearTimeout(stallTimeout);
+      video.removeEventListener('waiting', handleWaiting);
+      video.removeEventListener('canplay', handleCanPlay);
+      video.removeEventListener('canplaythrough', handleCanPlayThrough);
+      video.removeEventListener('progress', handleProgress);
+      video.removeEventListener('seeking', handleSeeking);
+      video.removeEventListener('seeked', handleSeeked);
+    };
+  }, [selectedClip?.id, forceBufferCheck]);
 
   const handleTimeUpdate = () => {
     if (videoRef.current && selectedClip && !isTransitioning.current) {
@@ -49,13 +138,13 @@ const VideoPreview = () => {
       if (clipEndTime && videoCurrentTime >= clipEndTime - 0.02) {
         console.log("🎬 TIME-UPDATE: Clip reached end, triggering seamless transition");
         isTransitioning.current = true;
-        
+
         if (transitionTimeoutRef.current) {
           clearTimeout(transitionTimeoutRef.current);
         }
-        
+
         handleClipEnded();
-        
+
         transitionTimeoutRef.current = setTimeout(() => {
           isTransitioning.current = false;
         }, 500);
@@ -107,7 +196,7 @@ const VideoPreview = () => {
 
       console.log("🎬 CLIP-CHANGE: Selected clip changed to:", selectedClip.id);
       console.log("🎬 CLIP-CHANGE: Clip start time:", clipStartTime, "duration:", clipDuration);
-      
+
       setClipDisplayDuration(clipDuration > 0 ? clipDuration : (videoRef.current.duration || 8));
       setCurrentTime(0);
 
@@ -129,12 +218,12 @@ const VideoPreview = () => {
 
   const handleProgressBarClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!selectedClip || clipDisplayDuration === 0) return;
-    
+
     const rect = e.currentTarget.getBoundingClientRect();
     const clickX = e.clientX - rect.left;
     const progress = clickX / rect.width;
     const newTime = progress * clipDisplayDuration;
-    
+
     console.log("🎬 PROGRESS-CLICK: Seeking to time:", newTime);
     seekToTime(newTime);
   };
@@ -183,29 +272,59 @@ const VideoPreview = () => {
               preload="auto"
               playsInline
               muted={false}
-              onWaiting={() => {
-                console.log("🎬 BUFFER: Video buffering...");
-                setIsBuffering(true);
-              }}
-              onCanPlayThrough={() => {
-                console.log("🎬 BUFFER: Video ready to play through");
-                setIsBuffering(false);
-              }}
-              onLoadStart={() => console.log("🎬 BUFFER: Video load started")}
-              onProgress={() => console.log("🎬 BUFFER: Video loading progress")}
             />
-            {/* Loading/Buffering Indicator */}
-            {isBuffering && (
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+
+            {/* Enhanced Loading/Buffering Indicator */}
+            {(isBuffering || bufferStalled) && (
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none bg-black/20">
+                <div className="bg-black/80 rounded-lg p-4 flex flex-col items-center gap-3">
+                  {bufferStalled ? (
+                    <>
+                      <div className="w-8 h-8 border-2 border-red-400/30 border-t-red-400 rounded-full animate-spin"></div>
+                      <div className="text-white text-sm">Connection issues - retrying...</div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                      <div className="text-white text-sm">Buffering...</div>
+                    </>
+                  )}
+                  {bufferHealth > 0 && (
+                    <div className="w-32 h-1 bg-white/20 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-blue-400 transition-all duration-300"
+                        style={{ width: `${bufferHealth}%` }}
+                      ></div>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
-            
-            {/* Preload Status Indicator */}
+
+            {/* Enhanced Preload Status Indicator */}
             {selectedClip && (
-              <div className="absolute top-2 right-2 flex items-center gap-1 text-xs text-white/70 bg-black/50 px-2 py-1 rounded">
-                <div className={`w-2 h-2 rounded-full ${isPreloaded(selectedClip.id) ? 'bg-green-400' : 'bg-yellow-400'}`}></div>
-                {isPreloaded(selectedClip.id) ? 'Ready' : 'Loading'}
+              <div className="absolute top-2 right-2 flex items-center gap-2 text-xs text-white/90 bg-black/60 px-3 py-1.5 rounded-lg backdrop-blur-sm">
+                <div className={`w-2 h-2 rounded-full ${isPreloaded(selectedClip.id)
+                    ? 'bg-green-400 shadow-lg shadow-green-400/30'
+                    : bufferHealth > 50
+                      ? 'bg-yellow-400 shadow-lg shadow-yellow-400/30'
+                      : 'bg-red-400 shadow-lg shadow-red-400/30'
+                  }`}></div>
+                <span className="font-medium">
+                  {isPreloaded(selectedClip.id)
+                    ? 'Ready'
+                    : bufferHealth > 0
+                      ? `${Math.round(bufferHealth)}%`
+                      : 'Loading'}
+                </span>
+                {bufferHealth > 0 && bufferHealth < 100 && (
+                  <div className="w-12 h-1 bg-white/20 rounded-full overflow-hidden ml-1">
+                    <div
+                      className="h-full bg-current transition-all duration-300"
+                      style={{ width: `${bufferHealth}%` }}
+                    ></div>
+                  </div>
+                )}
               </div>
             )}
 
@@ -249,7 +368,7 @@ const VideoPreview = () => {
           </Button>
         </div>
         <div className="flex-1 mx-4">
-          <div 
+          <div
             className="w-full bg-muted h-1.5 rounded-full overflow-hidden cursor-pointer"
             onClick={handleProgressBarClick}
           >
