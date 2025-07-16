@@ -21,16 +21,13 @@ export const useTransitionManager = (
     progress: 0
   });
 
-  const preloadVideo = useRef<HTMLVideoElement | null>(null);
-  const transitionTimeout = useRef<NodeJS.Timeout | null>(null);
-
   const { 
     timelineClips, 
     selectedClip, 
     setSelectedClip, 
     setCurrentTime, 
     setTransitionState,
-    bufferStates,
+    setAbsoluteTimelinePosition,
     setIsPlaying 
   } = useEditorStore();
 
@@ -40,75 +37,14 @@ export const useTransitionManager = (
     setTransitionState(transitionState.current);
   }, [setTransitionState]);
 
-  // Preload next clip for smooth transition
-  const preloadNextClip = useCallback(async (nextClip: MediaClip): Promise<void> => {
-    if (!nextClip || preloadVideo.current?.src === nextClip.src) return;
-
-    console.log('🎬 TRANSITION: Preloading next clip for smooth transition:', nextClip.id);
-
-    // Create or reuse preload video element
-    if (!preloadVideo.current) {
-      preloadVideo.current = document.createElement('video');
-      preloadVideo.current.style.display = 'none';
-      preloadVideo.current.muted = true;
-      preloadVideo.current.preload = 'auto';
-      document.body.appendChild(preloadVideo.current);
-    }
-
-    return new Promise((resolve, reject) => {
-      const video = preloadVideo.current!;
-      
-      const cleanup = () => {
-        video.removeEventListener('canplaythrough', onCanPlay);
-        video.removeEventListener('error', onError);
-        video.removeEventListener('progress', onProgress);
-      };
-
-      const onCanPlay = () => {
-        console.log('✅ TRANSITION: Next clip preloaded successfully');
-        cleanup();
-        resolve();
-      };
-
-      const onError = (error: any) => {
-        console.error('❌ TRANSITION: Failed to preload next clip:', error);
-        cleanup();
-        reject(error);
-      };
-
-      const onProgress = () => {
-        if (video.buffered.length > 0) {
-          const buffered = video.buffered.end(0);
-          const duration = video.duration || 1;
-          const progress = (buffered / duration) * 100;
-          
-          updateTransitionState({ progress });
-        }
-      };
-
-      video.addEventListener('canplaythrough', onCanPlay);
-      video.addEventListener('error', onError);
-      video.addEventListener('progress', onProgress);
-      
-      video.src = nextClip.src;
-      video.load();
-
-      // Timeout after 10 seconds
-      setTimeout(() => {
-        cleanup();
-        reject(new Error('Preload timeout'));
-      }, 10000);
-    });
-  }, [updateTransitionState]);
-
-  // Smooth transition to next clip
+  // Smooth transition to next clip while maintaining audio continuity
   const transitionToClip = useCallback(async (nextClip: MediaClip, startTime: number = 0): Promise<void> => {
     if (!videoRef.current || !nextClip) return;
 
     const video = videoRef.current;
     const currentClip = selectedClip;
     
-    console.log('🎬 TRANSITION: Starting transition to clip:', nextClip.id);
+    console.log('🎬 TRANSITION: Starting seamless transition to clip:', nextClip.id);
 
     updateTransitionState({
       isTransitioning: true,
@@ -118,36 +54,35 @@ export const useTransitionManager = (
     });
 
     try {
-      // Check if next clip is already preloaded
-      const bufferState = bufferStates[nextClip.id];
-      if (!bufferState?.isLoaded) {
-        console.log('🎬 TRANSITION: Next clip not preloaded, loading now...');
-        await preloadNextClip(nextClip);
-      }
-
-      // Store current playback state
-      const wasPlaying = !video.paused;
+      // CRITICAL: Keep audio playing during transition for seamless experience
       const audioWasPlaying = audioRef.current ? !audioRef.current.paused : false;
-
-      // Pause current playback
-      if (wasPlaying) {
-        video.pause();
-      }
-      if (audioWasPlaying && audioRef.current) {
-        audioRef.current.pause();
-      }
-
-      // Set new clip
+      
+      // Update state immediately
       setSelectedClip(nextClip);
       setCurrentTime(0);
 
-      // Handle video source change
+      // Handle video source change without interrupting audio
       if (video.src !== nextClip.src) {
+        console.log('🎬 TRANSITION: Changing video source for seamless transition');
+        
         await new Promise<void>((resolve, reject) => {
           const handleCanPlay = () => {
             video.removeEventListener('canplay', handleCanPlay);
             video.removeEventListener('error', handleError);
-            resolve();
+            
+            // Set the start time and play if audio is playing
+            const clipStartTime = nextClip.startTime ?? startTime;
+            video.currentTime = clipStartTime;
+            
+            // Only play video if audio is playing - maintain sync
+            if (audioWasPlaying) {
+              video.play().then(() => {
+                console.log('✅ TRANSITION: Video resumed seamlessly');
+                resolve();
+              }).catch(reject);
+            } else {
+              resolve();
+            }
           };
 
           const handleError = (error: any) => {
@@ -162,20 +97,10 @@ export const useTransitionManager = (
           video.src = nextClip.src;
           video.load();
         });
-      }
-
-      // Set start time
-      const clipStartTime = nextClip.startTime ?? startTime;
-      video.currentTime = clipStartTime;
-
-      // Resume playback if was playing
-      if (wasPlaying) {
-        await video.play();
-        setIsPlaying(true);
-      }
-
-      if (audioWasPlaying && audioRef.current) {
-        audioRef.current.play();
+      } else {
+        // Same video source - just update time
+        const clipStartTime = nextClip.startTime ?? startTime;
+        video.currentTime = clipStartTime;
       }
 
       updateTransitionState({
@@ -183,7 +108,7 @@ export const useTransitionManager = (
         progress: 100
       });
 
-      console.log('✅ TRANSITION: Transition completed successfully');
+      console.log('✅ TRANSITION: Seamless transition completed successfully');
 
     } catch (error) {
       console.error('❌ TRANSITION: Transition failed:', error);
@@ -199,7 +124,7 @@ export const useTransitionManager = (
         video.load();
       }
     }
-  }, [videoRef, audioRef, selectedClip, setSelectedClip, setCurrentTime, setIsPlaying, bufferStates, preloadNextClip, updateTransitionState]);
+  }, [videoRef, audioRef, selectedClip, setSelectedClip, setCurrentTime, updateTransitionState]);
 
   // Auto-transition to next clip when current ends
   const handleAutoTransition = useCallback(() => {
@@ -209,53 +134,32 @@ export const useTransitionManager = (
     if (currentIndex >= 0 && currentIndex < timelineClips.length - 1) {
       const nextClip = timelineClips[currentIndex + 1];
       console.log('🎬 TRANSITION: Auto-transitioning to next clip:', nextClip.id);
+      
+      // Calculate new absolute position
+      let newAbsolutePosition = 0;
+      for (let i = 0; i <= currentIndex; i++) {
+        const clip = timelineClips[i];
+        const clipDuration = (clip.endTime ?? clip.originalDuration ?? 0) - (clip.startTime ?? 0);
+        newAbsolutePosition += clipDuration;
+      }
+      
+      setAbsoluteTimelinePosition(newAbsolutePosition);
       transitionToClip(nextClip);
     } else {
       console.log('🎬 TRANSITION: Reached end of timeline');
       setIsPlaying(false);
     }
-  }, [selectedClip, timelineClips, transitionToClip, setIsPlaying]);
-
-  // Preload next clip when approaching end of current clip
-  useEffect(() => {
-    if (!selectedClip || !videoRef.current) return;
-
-    const video = videoRef.current;
-    const currentIndex = timelineClips.findIndex(c => c.id === selectedClip.id);
-    
-    if (currentIndex >= 0 && currentIndex < timelineClips.length - 1) {
-      const nextClip = timelineClips[currentIndex + 1];
-      
-      const handleTimeUpdate = () => {
-        const clipEndTime = selectedClip.endTime ?? selectedClip.originalDuration ?? video.duration;
-        const timeRemaining = clipEndTime - video.currentTime;
-        
-        // Preload next clip when 3 seconds remaining
-        if (timeRemaining <= 3 && timeRemaining > 0) {
-          const bufferState = bufferStates[nextClip.id];
-          if (!bufferState?.isLoaded && !transitionState.current.isTransitioning) {
-            console.log('🎬 TRANSITION: Preloading next clip (3s remaining)');
-            preloadNextClip(nextClip).catch(console.error);
-          }
-        }
-      };
-
-      video.addEventListener('timeupdate', handleTimeUpdate);
-      return () => video.removeEventListener('timeupdate', handleTimeUpdate);
-    }
-  }, [selectedClip, timelineClips, videoRef, bufferStates, preloadNextClip]);
+  }, [selectedClip, timelineClips, transitionToClip, setIsPlaying, setAbsoluteTimelinePosition]);
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      if (transitionTimeout.current) {
-        clearTimeout(transitionTimeout.current);
-      }
-      if (preloadVideo.current) {
-        preloadVideo.current.remove();
+      // Clean up any ongoing transitions
+      if (transitionState.current.isTransitioning) {
+        updateTransitionState({ isTransitioning: false });
       }
     };
-  }, []);
+  }, [updateTransitionState]);
 
   return {
     transitionToClip,
