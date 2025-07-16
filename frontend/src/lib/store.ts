@@ -3,6 +3,23 @@ import { create } from 'zustand';
 import { TimelineClip } from '@/types';
 import { generateId } from './utils';
 
+interface BufferState {
+  clipId: string;
+  bufferLevel: number;
+  isBuffering: boolean;
+  isLoaded: boolean;
+  retryCount: number;
+  lastError?: string;
+}
+
+interface TransitionState {
+  isTransitioning: boolean;
+  fromClip: TimelineClip | null;
+  toClip: TimelineClip | null;
+  progress: number;
+  error?: string;
+}
+
 interface EditorState {
   clips: TimelineClip[];
   selectedClipId: string | null;
@@ -25,6 +42,13 @@ interface EditorState {
   absoluteTimelinePosition: number;
   isAudioMaster: boolean;
   trimmingClipId: string | null;
+  
+  // Buffer and transition states
+  bufferStates: Record<string, BufferState>;
+  errorStates: Record<string, string>;
+  transitionState: TransitionState;
+  isBuffering: boolean;
+  memoryUsage: number;
 }
 
 interface EditorActions {
