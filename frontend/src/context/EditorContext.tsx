@@ -21,6 +21,10 @@ interface EditorContextType {
   videoRef: React.RefObject<HTMLVideoElement>;
   audioRef: React.RefObject<HTMLAudioElement>;
   getAbsoluteTimePosition: () => number;
+  getBufferState: (clipId: string) => any;
+  preloadClip: (clip: MediaClip) => Promise<void>;
+  memoryUsage: number;
+  preloadedClipsCount: number;
 }
 
 const EditorContext = createContext<EditorContextType | undefined>(undefined);
