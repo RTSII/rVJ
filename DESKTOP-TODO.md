@@ -1,6 +1,6 @@
 # rVJ Desktop Conversion - TODO List
 
-**Last Updated**: January 17, 2026 | **Status**: Phase 5 Complete
+**Last Updated**: January 17, 2026 | **Status**: Alpha Launch Successful ✅
 
 ---
 
@@ -88,8 +88,9 @@
 
 | Issue | Severity | Status |
 |-------|----------|--------|
-| Cargo build conflicts with multiple processes | Low | Workaround: Use clean build |
-| Timeline imports case-sensitivity warning | Low | Fixed with explicit path |
+| Cargo build conflicts with multiple processes | Low | Use `cargo clean` and `-j 1` |
+| STATUS_ENTRYPOINT_NOT_FOUND (Debug) | High | Investigating WebView2/MSVC mismatch |
+| `icon.ico` missing in Release build | Medium | Installing `sharp` for conversion |
 | FFmpeg not bundled in dev mode | Medium | Works after `tauri:build` |
 
 ---

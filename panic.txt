@@ -1,0 +1,61 @@
+﻿rvj.exe : 
+At line:1 char:24
++ $env:RUST_BACKTRACE=1; & 
+C:\RustBuilds\rvj\debug\rvj.exe 
+2>&1 | Out-F ...
++                        ~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : N 
+   otSpecified: (:String) [],   
+  RemoteException
+    + FullyQualifiedErrorId : N 
+   ativeCommandError
+ 
+thread 'main' (11276) panicked 
+at src\main.rs:183:10:
+error while running tauri 
+application: 
+PluginInitialization("dialog", 
+"Error deserializing 
+'plugins.dialog' within your 
+Tauri configuration: invalid 
+type: map, expected unit")
+stack backtrace:
+   0: 
+std::panicking::panic_handler
+             at /rustc/ded5c06cf
+21d2b93bffd5d884aa6e96934ee4234/
+library\std\src\panicking.rs:698
+   1: core::panicking::panic_fmt
+             at /rustc/ded5c06cf
+21d2b93bffd5d884aa6e96934ee4234/
+library\core\src\panicking.rs:80
+   2: 
+core::result::unwrap_failed
+             at /rustc/ded5c06cf
+21d2b93bffd5d884aa6e96934ee4234/
+library\core\src\result.rs:1862
+   3: enum2$<core::result::Resul
+t<tuple$<>,enum2$<tauri::error::
+Error> > >::expect<tuple$<>,enum
+2$<tauri::error::Error> >
+             at /rustc/ded5c06cf
+21d2b93bffd5d884aa6e96934ee4234\
+library\core\src\result.rs:1185
+   4: rvj::main
+             at 
+.\src-tauri\src\main.rs:183
+   5: core::ops::function::FnOnc
+e::call_once<void 
+(*)(),tuple$<> >
+             at /rustc/ded5c06cf
+21d2b93bffd5d884aa6e96934ee4234\
+library\core\src\ops\function.rs
+:250
+   6: core::hint::black_box
+             at /rustc/ded5c06cf
+21d2b93bffd5d884aa6e96934ee4234\
+library\core\src\hint.rs:472
+note: Some details are omitted, 
+run with `RUST_BACKTRACE=full` 
+for a verbose backtrace.

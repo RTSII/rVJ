@@ -1,0 +1,732 @@
+﻿cargo : [1m[92m   
+Compiling[0m tauri v2.9.5
+At line:1 char:105
++ ... ustBuilds\rvj"; cd 
+src-tauri; cargo build --color 
+always 2>&1 | Out-F ...
++                               
+    
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : N 
+   otSpecified: ([1m[92m   C  
+  ompiling[0m tauri v2.9.5:S   
+ tring) [], RemoteException
+    + FullyQualifiedErrorId : N 
+   ativeCommandError
+ 
+[1m[92m   Compiling[0m rvj 
+v0.1.0 (C:\Users\rtsii\Desktop\A
+I\Projects\All VJ 
+Projects\rVJ\src-tauri)
+[1m[92m   Compiling[0m 
+tauri-macros v2.5.2
+[1m[92m   Compiling[0m 
+tauri-plugin-fs v2.4.5
+[1m[92m   Compiling[0m 
+tauri-plugin-shell v2.3.4
+[1m[92m   Compiling[0m 
+tauri-plugin-dialog v2.6.0
+[1m[91merror[0m: failed to 
+run custom build command for 
+`rvj v0.1.0 (C:\Users\rtsii\Desk
+top\AI\Projects\All VJ 
+Projects\rVJ\src-tauri)`
+note: To improve backtraces for 
+build dependencies, set the CARG
+O_PROFILE_DEV_BUILD_OVERRIDE_DEB
+UG=true environment variable to 
+enable debug information 
+generation.
+
+Caused by:
+  process didn't exit 
+successfully: `C:\RustBuilds\rvj
+\debug\build\rvj-12884218df394a6
+2\build-script-build` (exit 
+code: 1)
+  --- stdout
+  cargo:rerun-if-env-changed=TAU
+RI_CONFIG
+  cargo:rustc-check-cfg=cfg(desk
+top)
+  cargo:rustc-cfg=desktop
+  cargo:rustc-check-cfg=cfg(mobi
+le)
+  cargo:rerun-if-changed=C:\User
+s\rtsii\Desktop\AI\Projects\All 
+VJ Projects\rVJ\src-tauri\tauri.
+conf.json
+  cargo:rustc-env=TAURI_ANDROID_
+PACKAGE_NAME_APP_NAME=rvj
+  cargo:rustc-env=TAURI_ANDROID_
+PACKAGE_NAME_PREFIX=com_rtsii
+  cargo:rustc-check-cfg=cfg(dev)
+  cargo:PERMISSION_FILES_PATH=C:
+\RustBuilds\rvj\debug\build\rvj-
+a69a647a38b786fc\out\app-manifes
+t\__app__-permission-files
+  cargo:rerun-if-changed=capabil
+ities
+  Permission 
+fs:allow-read-recursive not 
+found, expected one of 
+core:default, core:app:default, 
+core:app:allow-app-hide, 
+core:app:allow-app-show, 
+core:app:allow-bundle-type, core
+:app:allow-default-window-icon, 
+core:app:allow-fetch-data-store-
+identifiers, 
+core:app:allow-identifier, 
+core:app:allow-name, core:app:al
+low-register-listener, core:app:
+allow-remove-data-store, 
+core:app:allow-remove-listener, 
+core:app:allow-set-app-theme, co
+re:app:allow-set-dock-visibility
+, core:app:allow-tauri-version, 
+core:app:allow-version, 
+core:app:deny-app-hide, 
+core:app:deny-app-show, 
+core:app:deny-bundle-type, core:
+app:deny-default-window-icon, co
+re:app:deny-fetch-data-store-ide
+ntifiers, 
+core:app:deny-identifier, 
+core:app:deny-name, core:app:den
+y-register-listener, core:app:de
+ny-remove-data-store, 
+core:app:deny-remove-listener, 
+core:app:deny-set-app-theme, cor
+e:app:deny-set-dock-visibility, 
+core:app:deny-tauri-version, 
+core:app:deny-version, 
+core:event:default, 
+core:event:allow-emit, 
+core:event:allow-emit-to, 
+core:event:allow-listen, 
+core:event:allow-unlisten, 
+core:event:deny-emit, 
+core:event:deny-emit-to, 
+core:event:deny-listen, 
+core:event:deny-unlisten, 
+core:image:default, 
+core:image:allow-from-bytes, 
+core:image:allow-from-path, 
+core:image:allow-new, 
+core:image:allow-rgba, 
+core:image:allow-size, 
+core:image:deny-from-bytes, 
+core:image:deny-from-path, 
+core:image:deny-new, 
+core:image:deny-rgba, 
+core:image:deny-size, 
+core:menu:default, 
+core:menu:allow-append, 
+core:menu:allow-create-default, 
+core:menu:allow-get, 
+core:menu:allow-insert, 
+core:menu:allow-is-checked, 
+core:menu:allow-is-enabled, 
+core:menu:allow-items, 
+core:menu:allow-new, 
+core:menu:allow-popup, 
+core:menu:allow-prepend, 
+core:menu:allow-remove, 
+core:menu:allow-remove-at, core:
+menu:allow-set-accelerator, core
+:menu:allow-set-as-app-menu, cor
+e:menu:allow-set-as-help-menu-fo
+r-nsapp, core:menu:allow-set-as-
+window-menu, core:menu:allow-set
+-as-windows-menu-for-nsapp, 
+core:menu:allow-set-checked, 
+core:menu:allow-set-enabled, 
+core:menu:allow-set-icon, 
+core:menu:allow-set-text, 
+core:menu:allow-text, 
+core:menu:deny-append, 
+core:menu:deny-create-default, 
+core:menu:deny-get, 
+core:menu:deny-insert, 
+core:menu:deny-is-checked, 
+core:menu:deny-is-enabled, 
+core:menu:deny-items, 
+core:menu:deny-new, 
+core:menu:deny-popup, 
+core:menu:deny-prepend, 
+core:menu:deny-remove, 
+core:menu:deny-remove-at, 
+core:menu:deny-set-accelerator, 
+core:menu:deny-set-as-app-menu, 
+core:menu:deny-set-as-help-menu-
+for-nsapp, core:menu:deny-set-as
+-window-menu, core:menu:deny-set
+-as-windows-menu-for-nsapp, 
+core:menu:deny-set-checked, 
+core:menu:deny-set-enabled, 
+core:menu:deny-set-icon, 
+core:menu:deny-set-text, 
+core:menu:deny-text, 
+core:path:default, 
+core:path:allow-basename, 
+core:path:allow-dirname, 
+core:path:allow-extname, 
+core:path:allow-is-absolute, 
+core:path:allow-join, 
+core:path:allow-normalize, 
+core:path:allow-resolve, core:pa
+th:allow-resolve-directory, 
+core:path:deny-basename, 
+core:path:deny-dirname, 
+core:path:deny-extname, 
+core:path:deny-is-absolute, 
+core:path:deny-join, 
+core:path:deny-normalize, 
+core:path:deny-resolve, core:pat
+h:deny-resolve-directory, 
+core:resources:default, 
+core:resources:allow-close, 
+core:resources:deny-close, 
+core:tray:default, 
+core:tray:allow-get-by-id, 
+core:tray:allow-new, 
+core:tray:allow-remove-by-id, 
+core:tray:allow-set-icon, core:t
+ray:allow-set-icon-as-template, 
+core:tray:allow-set-menu, core:t
+ray:allow-set-show-menu-on-left-
+click, core:tray:allow-set-temp-
+dir-path, 
+core:tray:allow-set-title, 
+core:tray:allow-set-tooltip, 
+core:tray:allow-set-visible, 
+core:tray:deny-get-by-id, 
+core:tray:deny-new, 
+core:tray:deny-remove-by-id, 
+core:tray:deny-set-icon, core:tr
+ay:deny-set-icon-as-template, 
+core:tray:deny-set-menu, core:tr
+ay:deny-set-show-menu-on-left-cl
+ick, core:tray:deny-set-temp-dir
+-path, 
+core:tray:deny-set-title, 
+core:tray:deny-set-tooltip, 
+core:tray:deny-set-visible, 
+core:webview:default, core:webvi
+ew:allow-clear-all-browsing-data
+, core:webview:allow-create-webv
+iew, core:webview:allow-create-w
+ebview-window, core:webview:allo
+w-get-all-webviews, core:webview
+:allow-internal-toggle-devtools,
+ core:webview:allow-print, 
+core:webview:allow-reparent, cor
+e:webview:allow-set-webview-auto
+-resize, core:webview:allow-set-
+webview-background-color, core:w
+ebview:allow-set-webview-focus, 
+core:webview:allow-set-webview-p
+osition, core:webview:allow-set-
+webview-size, core:webview:allow
+-set-webview-zoom, core:webview:
+allow-webview-close, core:webvie
+w:allow-webview-hide, core:webvi
+ew:allow-webview-position, core:
+webview:allow-webview-show, core
+:webview:allow-webview-size, cor
+e:webview:deny-clear-all-browsin
+g-data, core:webview:deny-create
+-webview, core:webview:deny-crea
+te-webview-window, core:webview:
+deny-get-all-webviews, core:webv
+iew:deny-internal-toggle-devtool
+s, core:webview:deny-print, 
+core:webview:deny-reparent, core
+:webview:deny-set-webview-auto-r
+esize, core:webview:deny-set-web
+view-background-color, core:webv
+iew:deny-set-webview-focus, core
+:webview:deny-set-webview-positi
+on, core:webview:deny-set-webvie
+w-size, core:webview:deny-set-we
+bview-zoom, core:webview:deny-we
+bview-close, 
+core:webview:deny-webview-hide, 
+core:webview:deny-webview-positi
+on, 
+core:webview:deny-webview-show, 
+core:webview:deny-webview-size, 
+core:window:default, core:window
+:allow-available-monitors, 
+core:window:allow-center, 
+core:window:allow-close, 
+core:window:allow-create, core:w
+indow:allow-current-monitor, cor
+e:window:allow-cursor-position, 
+core:window:allow-destroy, core:
+window:allow-get-all-windows, 
+core:window:allow-hide, core:win
+dow:allow-inner-position, 
+core:window:allow-inner-size, co
+re:window:allow-internal-toggle-
+maximize, core:window:allow-is-a
+lways-on-top, 
+core:window:allow-is-closable, 
+core:window:allow-is-decorated, 
+core:window:allow-is-enabled, 
+core:window:allow-is-focused, co
+re:window:allow-is-fullscreen, c
+ore:window:allow-is-maximizable,
+ 
+core:window:allow-is-maximized, 
+core:window:allow-is-minimizable
+, 
+core:window:allow-is-minimized, 
+core:window:allow-is-resizable, 
+core:window:allow-is-visible, 
+core:window:allow-maximize, 
+core:window:allow-minimize, core
+:window:allow-monitor-from-point
+, core:window:allow-outer-positi
+on, 
+core:window:allow-outer-size, co
+re:window:allow-primary-monitor,
+ core:window:allow-request-user-
+attention, 
+core:window:allow-scale-factor, 
+core:window:allow-set-always-on-
+bottom, core:window:allow-set-al
+ways-on-top, core:window:allow-s
+et-background-color, core:window
+:allow-set-badge-count, core:win
+dow:allow-set-badge-label, 
+core:window:allow-set-closable, 
+core:window:allow-set-content-pr
+otected, core:window:allow-set-c
+ursor-grab, core:window:allow-se
+t-cursor-icon, core:window:allow
+-set-cursor-position, core:windo
+w:allow-set-cursor-visible, core
+:window:allow-set-decorations, 
+core:window:allow-set-effects, 
+core:window:allow-set-enabled, 
+core:window:allow-set-focus, cor
+e:window:allow-set-focusable, co
+re:window:allow-set-fullscreen, 
+core:window:allow-set-icon, core
+:window:allow-set-ignore-cursor-
+events, 
+core:window:allow-set-max-size, 
+core:window:allow-set-maximizabl
+e, 
+core:window:allow-set-min-size, 
+core:window:allow-set-minimizabl
+e, core:window:allow-set-overlay
+-icon, 
+core:window:allow-set-position, 
+core:window:allow-set-progress-b
+ar, core:window:allow-set-resiza
+ble, 
+core:window:allow-set-shadow, co
+re:window:allow-set-simple-fulls
+creen, 
+core:window:allow-set-size, core
+:window:allow-set-size-constrain
+ts, core:window:allow-set-skip-t
+askbar, 
+core:window:allow-set-theme, 
+core:window:allow-set-title, cor
+e:window:allow-set-title-bar-sty
+le, core:window:allow-set-visibl
+e-on-all-workspaces, 
+core:window:allow-show, core:win
+dow:allow-start-dragging, core:w
+indow:allow-start-resize-draggin
+g, core:window:allow-theme, 
+core:window:allow-title, core:wi
+ndow:allow-toggle-maximize, 
+core:window:allow-unmaximize, 
+core:window:allow-unminimize, co
+re:window:deny-available-monitor
+s, core:window:deny-center, 
+core:window:deny-close, 
+core:window:deny-create, core:wi
+ndow:deny-current-monitor, core:
+window:deny-cursor-position, 
+core:window:deny-destroy, core:w
+indow:deny-get-all-windows, 
+core:window:deny-hide, core:wind
+ow:deny-inner-position, 
+core:window:deny-inner-size, cor
+e:window:deny-internal-toggle-ma
+ximize, core:window:deny-is-alwa
+ys-on-top, 
+core:window:deny-is-closable, 
+core:window:deny-is-decorated, 
+core:window:deny-is-enabled, 
+core:window:deny-is-focused, 
+core:window:deny-is-fullscreen, 
+core:window:deny-is-maximizable,
+ core:window:deny-is-maximized, 
+core:window:deny-is-minimizable,
+ core:window:deny-is-minimized, 
+core:window:deny-is-resizable, 
+core:window:deny-is-visible, 
+core:window:deny-maximize, 
+core:window:deny-minimize, core:
+window:deny-monitor-from-point, 
+core:window:deny-outer-position,
+ core:window:deny-outer-size, co
+re:window:deny-primary-monitor, 
+core:window:deny-request-user-at
+tention, 
+core:window:deny-scale-factor, c
+ore:window:deny-set-always-on-bo
+ttom, core:window:deny-set-alway
+s-on-top, core:window:deny-set-b
+ackground-color, core:window:den
+y-set-badge-count, core:window:d
+eny-set-badge-label, 
+core:window:deny-set-closable, c
+ore:window:deny-set-content-prot
+ected, core:window:deny-set-curs
+or-grab, core:window:deny-set-cu
+rsor-icon, core:window:deny-set-
+cursor-position, core:window:den
+y-set-cursor-visible, core:windo
+w:deny-set-decorations, 
+core:window:deny-set-effects, 
+core:window:deny-set-enabled, 
+core:window:deny-set-focus, 
+core:window:deny-set-focusable, 
+core:window:deny-set-fullscreen,
+ core:window:deny-set-icon, core
+:window:deny-set-ignore-cursor-e
+vents, 
+core:window:deny-set-max-size, c
+ore:window:deny-set-maximizable,
+ core:window:deny-set-min-size, 
+core:window:deny-set-minimizable
+, core:window:deny-set-overlay-i
+con, 
+core:window:deny-set-position, c
+ore:window:deny-set-progress-bar
+, 
+core:window:deny-set-resizable, 
+core:window:deny-set-shadow, cor
+e:window:deny-set-simple-fullscr
+een, core:window:deny-set-size, 
+core:window:deny-set-size-constr
+aints, core:window:deny-set-skip
+-taskbar, 
+core:window:deny-set-theme, 
+core:window:deny-set-title, core
+:window:deny-set-title-bar-style
+, core:window:deny-set-visible-o
+n-all-workspaces, 
+core:window:deny-show, core:wind
+ow:deny-start-dragging, core:win
+dow:deny-start-resize-dragging, 
+core:window:deny-theme, 
+core:window:deny-title, core:win
+dow:deny-toggle-maximize, 
+core:window:deny-unmaximize, 
+core:window:deny-unminimize, 
+dialog:default, 
+dialog:allow-ask, 
+dialog:allow-confirm, 
+dialog:allow-message, 
+dialog:allow-open, 
+dialog:allow-save, 
+dialog:deny-ask, 
+dialog:deny-confirm, 
+dialog:deny-message, 
+dialog:deny-open, 
+dialog:deny-save, fs:default, 
+fs:allow-copy-file, 
+fs:allow-create, 
+fs:allow-exists, 
+fs:allow-fstat, 
+fs:allow-ftruncate, 
+fs:allow-lstat, fs:allow-mkdir, 
+fs:allow-open, fs:allow-read, 
+fs:allow-read-dir, 
+fs:allow-read-file, 
+fs:allow-read-text-file, 
+fs:allow-read-text-file-lines, f
+s:allow-read-text-file-lines-nex
+t, fs:allow-remove, 
+fs:allow-rename, fs:allow-seek, 
+fs:allow-size, fs:allow-stat, 
+fs:allow-truncate, 
+fs:allow-unwatch, 
+fs:allow-watch, fs:allow-write, 
+fs:allow-write-file, 
+fs:allow-write-text-file, 
+fs:create-app-specific-dirs, 
+fs:deny-copy-file, 
+fs:deny-create, fs:deny-exists, 
+fs:deny-fstat, 
+fs:deny-ftruncate, 
+fs:deny-lstat, fs:deny-mkdir, 
+fs:deny-open, fs:deny-read, 
+fs:deny-read-dir, 
+fs:deny-read-file, 
+fs:deny-read-text-file, 
+fs:deny-read-text-file-lines, fs
+:deny-read-text-file-lines-next,
+ fs:deny-remove, 
+fs:deny-rename, fs:deny-seek, 
+fs:deny-size, fs:deny-stat, 
+fs:deny-truncate, 
+fs:deny-unwatch, fs:deny-watch, 
+fs:deny-webview-data-linux, 
+fs:deny-webview-data-windows, 
+fs:deny-write, 
+fs:deny-write-file, 
+fs:deny-write-text-file, 
+fs:read-all, fs:read-app-specifi
+c-dirs-recursive, fs:read-dirs, 
+fs:read-files, fs:read-meta, 
+fs:scope, fs:scope-app, 
+fs:scope-app-index, 
+fs:scope-app-recursive, 
+fs:scope-appcache, 
+fs:scope-appcache-index, 
+fs:scope-appcache-recursive, 
+fs:scope-appconfig, 
+fs:scope-appconfig-index, 
+fs:scope-appconfig-recursive, 
+fs:scope-appdata, 
+fs:scope-appdata-index, 
+fs:scope-appdata-recursive, 
+fs:scope-applocaldata, 
+fs:scope-applocaldata-index, fs:
+scope-applocaldata-recursive, 
+fs:scope-applog, 
+fs:scope-applog-index, 
+fs:scope-applog-recursive, 
+fs:scope-audio, 
+fs:scope-audio-index, 
+fs:scope-audio-recursive, 
+fs:scope-cache, 
+fs:scope-cache-index, 
+fs:scope-cache-recursive, 
+fs:scope-config, 
+fs:scope-config-index, 
+fs:scope-config-recursive, 
+fs:scope-data, 
+fs:scope-data-index, 
+fs:scope-data-recursive, 
+fs:scope-desktop, 
+fs:scope-desktop-index, 
+fs:scope-desktop-recursive, 
+fs:scope-document, 
+fs:scope-document-index, 
+fs:scope-document-recursive, 
+fs:scope-download, 
+fs:scope-download-index, 
+fs:scope-download-recursive, 
+fs:scope-exe, 
+fs:scope-exe-index, 
+fs:scope-exe-recursive, 
+fs:scope-font, 
+fs:scope-font-index, 
+fs:scope-font-recursive, 
+fs:scope-home, 
+fs:scope-home-index, 
+fs:scope-home-recursive, 
+fs:scope-localdata, 
+fs:scope-localdata-index, 
+fs:scope-localdata-recursive, 
+fs:scope-log, 
+fs:scope-log-index, 
+fs:scope-log-recursive, 
+fs:scope-picture, 
+fs:scope-picture-index, 
+fs:scope-picture-recursive, 
+fs:scope-public, 
+fs:scope-public-index, 
+fs:scope-public-recursive, 
+fs:scope-resource, 
+fs:scope-resource-index, 
+fs:scope-resource-recursive, 
+fs:scope-runtime, 
+fs:scope-runtime-index, 
+fs:scope-runtime-recursive, 
+fs:scope-temp, 
+fs:scope-temp-index, 
+fs:scope-temp-recursive, 
+fs:scope-template, 
+fs:scope-template-index, 
+fs:scope-template-recursive, 
+fs:scope-video, 
+fs:scope-video-index, 
+fs:scope-video-recursive, 
+fs:write-all, fs:write-files, 
+fs:allow-app-meta, 
+fs:allow-app-meta-recursive, 
+fs:allow-app-read, 
+fs:allow-app-read-recursive, 
+fs:allow-app-write, 
+fs:allow-app-write-recursive, 
+fs:allow-appcache-meta, fs:allow
+-appcache-meta-recursive, 
+fs:allow-appcache-read, fs:allow
+-appcache-read-recursive, 
+fs:allow-appcache-write, fs:allo
+w-appcache-write-recursive, 
+fs:allow-appconfig-meta, fs:allo
+w-appconfig-meta-recursive, 
+fs:allow-appconfig-read, fs:allo
+w-appconfig-read-recursive, 
+fs:allow-appconfig-write, fs:all
+ow-appconfig-write-recursive, 
+fs:allow-appdata-meta, fs:allow-
+appdata-meta-recursive, 
+fs:allow-appdata-read, fs:allow-
+appdata-read-recursive, 
+fs:allow-appdata-write, fs:allow
+-appdata-write-recursive, 
+fs:allow-applocaldata-meta, fs:a
+llow-applocaldata-meta-recursive
+, fs:allow-applocaldata-read, fs
+:allow-applocaldata-read-recursi
+ve, 
+fs:allow-applocaldata-write, fs:
+allow-applocaldata-write-recursi
+ve, fs:allow-applog-meta, 
+fs:allow-applog-meta-recursive, 
+fs:allow-applog-read, 
+fs:allow-applog-read-recursive, 
+fs:allow-applog-write, fs:allow-
+applog-write-recursive, 
+fs:allow-audio-meta, 
+fs:allow-audio-meta-recursive, 
+fs:allow-audio-read, 
+fs:allow-audio-read-recursive, 
+fs:allow-audio-write, 
+fs:allow-audio-write-recursive, 
+fs:allow-cache-meta, 
+fs:allow-cache-meta-recursive, 
+fs:allow-cache-read, 
+fs:allow-cache-read-recursive, 
+fs:allow-cache-write, 
+fs:allow-cache-write-recursive, 
+fs:allow-config-meta, 
+fs:allow-config-meta-recursive, 
+fs:allow-config-read, 
+fs:allow-config-read-recursive, 
+fs:allow-config-write, fs:allow-
+config-write-recursive, 
+fs:allow-data-meta, 
+fs:allow-data-meta-recursive, 
+fs:allow-data-read, 
+fs:allow-data-read-recursive, 
+fs:allow-data-write, 
+fs:allow-data-write-recursive, 
+fs:allow-desktop-meta, fs:allow-
+desktop-meta-recursive, 
+fs:allow-desktop-read, fs:allow-
+desktop-read-recursive, 
+fs:allow-desktop-write, fs:allow
+-desktop-write-recursive, 
+fs:allow-document-meta, fs:allow
+-document-meta-recursive, 
+fs:allow-document-read, fs:allow
+-document-read-recursive, 
+fs:allow-document-write, fs:allo
+w-document-write-recursive, 
+fs:allow-download-meta, fs:allow
+-download-meta-recursive, 
+fs:allow-download-read, fs:allow
+-download-read-recursive, 
+fs:allow-download-write, fs:allo
+w-download-write-recursive, 
+fs:allow-exe-meta, 
+fs:allow-exe-meta-recursive, 
+fs:allow-exe-read, 
+fs:allow-exe-read-recursive, 
+fs:allow-exe-write, 
+fs:allow-exe-write-recursive, 
+fs:allow-font-meta, 
+fs:allow-font-meta-recursive, 
+fs:allow-font-read, 
+fs:allow-font-read-recursive, 
+fs:allow-font-write, 
+fs:allow-font-write-recursive, 
+fs:allow-home-meta, 
+fs:allow-home-meta-recursive, 
+fs:allow-home-read, 
+fs:allow-home-read-recursive, 
+fs:allow-home-write, 
+fs:allow-home-write-recursive, 
+fs:allow-localdata-meta, fs:allo
+w-localdata-meta-recursive, 
+fs:allow-localdata-read, fs:allo
+w-localdata-read-recursive, 
+fs:allow-localdata-write, fs:all
+ow-localdata-write-recursive, 
+fs:allow-log-meta, 
+fs:allow-log-meta-recursive, 
+fs:allow-log-read, 
+fs:allow-log-read-recursive, 
+fs:allow-log-write, 
+fs:allow-log-write-recursive, 
+fs:allow-picture-meta, fs:allow-
+picture-meta-recursive, 
+fs:allow-picture-read, fs:allow-
+picture-read-recursive, 
+fs:allow-picture-write, fs:allow
+-picture-write-recursive, 
+fs:allow-public-meta, 
+fs:allow-public-meta-recursive, 
+fs:allow-public-read, 
+fs:allow-public-read-recursive, 
+fs:allow-public-write, fs:allow-
+public-write-recursive, 
+fs:allow-resource-meta, fs:allow
+-resource-meta-recursive, 
+fs:allow-resource-read, fs:allow
+-resource-read-recursive, 
+fs:allow-resource-write, fs:allo
+w-resource-write-recursive, 
+fs:allow-runtime-meta, fs:allow-
+runtime-meta-recursive, 
+fs:allow-runtime-read, fs:allow-
+runtime-read-recursive, 
+fs:allow-runtime-write, fs:allow
+-runtime-write-recursive, 
+fs:allow-temp-meta, 
+fs:allow-temp-meta-recursive, 
+fs:allow-temp-read, 
+fs:allow-temp-read-recursive, 
+fs:allow-temp-write, 
+fs:allow-temp-write-recursive, 
+fs:allow-template-meta, fs:allow
+-template-meta-recursive, 
+fs:allow-template-read, fs:allow
+-template-read-recursive, 
+fs:allow-template-write, fs:allo
+w-template-write-recursive, 
+fs:allow-video-meta, 
+fs:allow-video-meta-recursive, 
+fs:allow-video-read, 
+fs:allow-video-read-recursive, 
+fs:allow-video-write, 
+fs:allow-video-write-recursive, 
+fs:deny-default, shell:default, 
+shell:allow-execute, 
+shell:allow-kill, 
+shell:allow-open, 
+shell:allow-spawn, 
+shell:allow-stdin-write, 
+shell:deny-execute, 
+shell:deny-kill, 
+shell:deny-open, 
+shell:deny-spawn, 
+shell:deny-stdin-write
+[1m[93mwarning[0m: build 
+failed, waiting for other jobs 
+to finish...

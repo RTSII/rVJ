@@ -143,21 +143,20 @@ rVJ/
 
 ---
 
-## 📋 Current Status
-
-**Phase 5 Complete** - The desktop conversion is functional with:
-
-- ✅ Native file dialogs for video/audio selection
-- ✅ Real waveform generation from audio files
-- ✅ Native FFmpeg thumbnail extraction
-- ✅ Native FFmpeg video export
-- ✅ Browser fallback mode maintained
+**Alpha Launch Successful** - The desktop conversion is functional with:
+- ✅ **New rVJ Branding**: Custom logo integrated into app and installer
+- ✅ **Native file dialogs** for video/audio selection
+- ✅ **Real waveform generation** from audio files
+- ✅ **Native FFmpeg thumbnail extraction**
+- ✅ **Native FFmpeg video export**
+- ✅ **Zero-buffering playback** via `asset://` protocol (2hr+ supported)
+- ✅ **Full Tauri 2.0 Security Migration**: Verified capabilities/permissions
 
 **Next Steps** (see `DESKTOP-TODO.md`):
-- Testing with 2+ hour video files
-- Performance optimization
+- Deep testing with large project files
+- Performance optimization (preloading)
 - Recent files / favorites feature
-- Windows installer packaging
+- Windows installer packaging (NSIS)
 
 ---
 
