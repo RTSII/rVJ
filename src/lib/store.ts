@@ -12,7 +12,7 @@ interface EditorState {
   waveformData: any[];
   audioUrl: string | null;
   zoomLevel: number;
-  
+
   // Additional properties needed by components
   timelineClips: TimelineClip[];
   selectedClip: TimelineClip | null;
@@ -38,12 +38,12 @@ interface EditorActions {
   setWaveformData: (waveformData: any[]) => void;
   setAudioUrl: (audioUrl: string | null) => void;
   setZoomLevel: (zoomLevel: number) => void;
-  
+
   // Additional actions needed by components
   setTimelineClips: (clips: TimelineClip[]) => void;
   setSelectedClip: (clip: TimelineClip | null) => void;
   addClipToTimeline: (clip: any) => void;
-  loadAudio: (file: File) => Promise<void>;
+  loadAudio: (fileOrPath: File | string, assetUrl?: string) => Promise<void>;
   setIsExporting: (isExporting: boolean) => void;
   setExportProgress: (progress: number) => void;
   addAudioMarker: (time: number) => void;
@@ -51,12 +51,12 @@ interface EditorActions {
   setAbsoluteTimelinePosition: (position: number) => void;
   resetToTimelineStart: () => void;
   setTrimmingClipId: (id: string | null) => void;
-  
+
   loadProject: (clips: TimelineClip[]) => void;
   clearTimeline: () => void;
 }
 
-interface EditorStore extends EditorState, EditorActions {}
+interface EditorStore extends EditorState, EditorActions { }
 
 export const useEditorStore = create<EditorStore>((set, get) => ({
   clips: [],
@@ -67,7 +67,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   waveformData: [],
   audioUrl: null,
   zoomLevel: 100,
-  
+
   // Additional state
   timelineClips: [],
   selectedClip: null,
@@ -91,14 +91,14 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       timelineClips: [...state.timelineClips, newClip],
     }));
   },
-  
+
   updateClip: (id, updates) => {
     set((state) => ({
       clips: state.clips.map((clip) => (clip.id === id ? { ...clip, ...updates } : clip)),
       timelineClips: state.timelineClips.map((clip) => (clip.id === id ? { ...clip, ...updates } : clip)),
     }));
   },
-  
+
   removeClip: (id) => {
     set((state) => ({
       clips: state.clips.filter((clip) => clip.id !== id),
@@ -107,40 +107,40 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       selectedClip: state.selectedClip?.id === id ? null : state.selectedClip,
     }));
   },
-  
+
   setSelectedClipId: (id) => {
     const clip = id ? get().timelineClips.find(c => c.id === id) || null : null;
-    set({ 
+    set({
       selectedClipId: id,
-      selectedClip: clip 
+      selectedClip: clip
     });
   },
-  
+
   setSelectedClip: (clip) => {
-    set({ 
+    set({
       selectedClip: clip,
-      selectedClipId: clip?.id || null 
+      selectedClipId: clip?.id || null
     });
   },
-  
+
   setIsPlaying: (isPlaying) => set({ isPlaying }),
   setCurrentTime: (currentTime) => set({ currentTime }),
   setDuration: (duration) => set({ duration }),
-  setWaveformData: (waveformData) => set({ 
+  setWaveformData: (waveformData) => set({
     waveformData,
-    waveform: waveformData 
+    waveform: waveformData
   }),
-  setAudioUrl: (audioUrl) => set({ 
+  setAudioUrl: (audioUrl) => set({
     audioUrl,
-    audioSrc: audioUrl 
+    audioSrc: audioUrl
   }),
   setZoomLevel: (zoomLevel) => set({ zoomLevel }),
-  
-  setTimelineClips: (clips) => set({ 
+
+  setTimelineClips: (clips) => set({
     timelineClips: clips,
-    clips: clips 
+    clips: clips
   }),
-  
+
   addClipToTimeline: (clip) => {
     const newClip: TimelineClip = {
       ...clip,
@@ -158,36 +158,47 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       };
     });
   },
-  
-  loadAudio: async (file: File) => {
-    const audioUrl = URL.createObjectURL(file);
-    set({ 
-      audioFile: file,
+
+  loadAudio: async (fileOrPath: File | string, assetUrl?: string) => {
+    let audioUrl: string;
+    let audioFile: File | null = null;
+
+    if (typeof fileOrPath === 'string') {
+      // Tauri desktop mode: use provided asset URL
+      audioUrl = assetUrl || fileOrPath;
+    } else {
+      // Browser mode: create blob URL from File
+      audioUrl = URL.createObjectURL(fileOrPath);
+      audioFile = fileOrPath;
+    }
+
+    set({
+      audioFile: audioFile,
       audioUrl,
-      audioSrc: audioUrl 
+      audioSrc: audioUrl
     });
-    
+
     // Generate basic waveform data
     const mockWaveform = Array.from({ length: 100 }, () => Math.random());
-    set({ 
+    set({
       waveform: mockWaveform,
-      waveformData: mockWaveform 
+      waveformData: mockWaveform
     });
   },
-  
+
   setIsExporting: (isExporting) => set({ isExporting }),
   setExportProgress: (exportProgress) => set({ exportProgress }),
-  
+
   addAudioMarker: (time) => {
     set((state) => ({
       audioMarkers: [...state.audioMarkers, time].sort((a, b) => a - b)
     }));
   },
-  
+
   setAudioMarkers: (audioMarkers) => set({ audioMarkers }),
   setAbsoluteTimelinePosition: (absoluteTimelinePosition) => set({ absoluteTimelinePosition }),
   setTrimmingClipId: (trimmingClipId) => set({ trimmingClipId }),
-  
+
   resetToTimelineStart: () => {
     const firstClip = get().timelineClips[0] || null;
     set({
@@ -197,7 +208,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       selectedClipId: firstClip?.id || null,
     });
   },
-  
+
   loadProject: (clips: TimelineClip[]) => set({
     clips,
     timelineClips: clips,
@@ -206,7 +217,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     currentTime: 0,
     absoluteTimelinePosition: 0,
   }),
-  
+
   clearTimeline: () => set({
     clips: [],
     timelineClips: [],

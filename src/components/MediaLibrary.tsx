@@ -63,12 +63,61 @@ const MediaLibrary = () => {
     });
   }, [mediaClips, thumbnailCache]);
 
-  const handleUploadVideoClick = () => {
-    videoInputRef.current?.click();
+  const handleUploadVideoClick = async () => {
+    // Check if running in Tauri desktop mode
+    const isTauri = typeof window !== 'undefined' && '__TAURI__' in window;
+
+    if (isTauri) {
+      // Use Tauri native file dialog
+      const { selectVideoFiles, convertToAssetUrl } = await import('@/lib/desktop');
+      const filePaths = await selectVideoFiles();
+
+      if (!filePaths) return;
+
+      // Create clips from selected file paths
+      const newClips: MediaClip[] = await Promise.all(
+        filePaths.map(async (filePath) => {
+          const assetUrl = await convertToAssetUrl(filePath);
+          return {
+            id: crypto.randomUUID(),
+            src: assetUrl,
+            filePath: filePath,
+            assetUrl: assetUrl,
+          };
+        })
+      );
+
+      setMediaClips(prevClips => [...prevClips, ...newClips]);
+    } else {
+      // Fallback to browser file input
+      videoInputRef.current?.click();
+    }
   };
-  
-  const handleUploadAudioClick = () => {
-    audioInputRef.current?.click();
+
+  const handleUploadAudioClick = async () => {
+    // Check if running in Tauri desktop mode
+    const isTauri = typeof window !== 'undefined' && '__TAURI__' in window;
+
+    if (isTauri) {
+      // Use Tauri native file dialog
+      const { selectAudioFile, convertToAssetUrl } = await import('@/lib/desktop');
+      const filePath = await selectAudioFile();
+
+      if (!filePath) return;
+
+      const assetUrl = await convertToAssetUrl(filePath);
+
+      // Load audio directly using asset URL
+      // We'll need to update loadAudio to handle both File and paths
+      try {
+        await loadAudio(filePath, assetUrl);
+      } catch (error) {
+        console.error("Error loading audio:", error);
+      }
+    } else {
+      // Fallback to browser file input
+      audioInputRef.current?.click();
+    }
   };
 
   const handleVideoFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -82,15 +131,15 @@ const MediaLibrary = () => {
         src: URL.createObjectURL(file),
         file: file,
       }));
-    
+
     setMediaClips(prevClips => [...prevClips, ...newClips]);
   };
-  
+
   const handleAudioFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    
+
     if (!file) return;
-    
+
     if (file.type.startsWith('audio/')) {
       try {
         await loadAudio(file);
@@ -99,6 +148,7 @@ const MediaLibrary = () => {
       }
     }
   };
+
 
   useEffect(() => {
     return () => {
@@ -110,14 +160,14 @@ const MediaLibrary = () => {
     if (dragItem.current === null || dragOverItem.current === null || dragItem.current === dragOverItem.current) return;
 
     setMediaClips(prevClips => {
-        const newClips = [...prevClips];
-        const draggedItemContent = newClips.splice(dragItem.current!, 1)[0];
-        if (draggedItemContent) {
-            newClips.splice(dragOverItem.current!, 0, draggedItemContent);
-        }
-        dragItem.current = null;
-        dragOverItem.current = null;
-        return newClips;
+      const newClips = [...prevClips];
+      const draggedItemContent = newClips.splice(dragItem.current!, 1)[0];
+      if (draggedItemContent) {
+        newClips.splice(dragOverItem.current!, 0, draggedItemContent);
+      }
+      dragItem.current = null;
+      dragOverItem.current = null;
+      return newClips;
     });
   };
 
@@ -170,7 +220,7 @@ const MediaLibrary = () => {
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground border border-dashed border-border rounded-lg p-4">
-              <UploadCloud className="h-8 w-8 mb-2"/>
+              <UploadCloud className="h-8 w-8 mb-2" />
               <p className="text-sm font-medium">Upload your media</p>
               <p className="text-xs opacity-75">Click to add videos to timeline</p>
             </div>

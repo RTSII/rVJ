@@ -1,4 +1,5 @@
 
+
 export type Transition = {
   type: 'crossfade';
   duration: number; // in seconds
@@ -7,7 +8,9 @@ export type Transition = {
 export type MediaClip = {
   id: string;
   src: string;
-  file: File;
+  file?: File; // Optional for backward compatibility
+  filePath?: string; // Native filesystem path (Tauri desktop mode)
+  assetUrl?: string; // Tauri asset:// URL for playback
   startTime?: number;
   endTime?: number;
   originalDuration?: number;
@@ -17,12 +20,15 @@ export type MediaClip = {
 export type TimelineClip = {
   id: string;
   src: string;
-  file: File;
+  file?: File; // Optional for backward compatibility
+  filePath?: string; // Native filesystem path (Tauri desktop mode)
+  assetUrl?: string; // Tauri asset:// URL for playback
   startTime?: number;
   endTime?: number;
   originalDuration?: number;
   transition?: Transition | null;
 };
+
 
 // Serializable version for database storage (without File objects)
 export type SerializableClip = {
