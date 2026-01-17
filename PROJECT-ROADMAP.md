@@ -93,9 +93,9 @@ const authorizedTools = {
 **When receiving multi-faceted requests:**
 
 1. **Scope Analysis**: Break down requirements into specialized domains
-2. **Team Assignment**: Delegate tasks to appropriate specialist teams
+2. **Team Assignment**: Delegate tasks to appropriate AI Agent/Model specialist 
 3. **Dependency Mapping**: Identify critical path and integration points
-4. **Resource Allocation**: Optimize tool usage across development teams
+4. **Resource Allocation**: Optimize tool usage across AI Agent/Models used
 5. **Quality Gates**: Implement validation checkpoints at each phase
 6. **Progress Monitoring**: Use versioning and Supermemory for transparency
 7. **Risk Management**: Proactive identification and mitigation of blockers
