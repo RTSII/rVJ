@@ -39,9 +39,9 @@
             "icons/icon.icns",
             "icons/icon.ico"
         ],
-        "resources": {
-            "ffmpeg.exe": "./"
-        }
+        "resources": [
+            "bin/ffmpeg.exe"
+        ]
     },
     "plugins": {
         "fs": {

@@ -8,17 +8,17 @@ import { toast } from "sonner";
 import { exportVideo } from "@/lib/export";
 import { FFmpeg } from '@ffmpeg/ffmpeg';
 import { Transition } from "@/types";
-import { 
-  TimelineControls, 
-  AudioTrack, 
-  VideoTrack, 
-  TimelineRuler 
-} from './timeline';
+import {
+  TimelineControls,
+  AudioTrack,
+  VideoTrack,
+  TimelineRuler
+} from './timeline/index';
 
 const Timeline = () => {
   const timelineContainerRef = useRef<HTMLDivElement>(null);
   const { audioRef, seekToAbsoluteTime, getAbsoluteTimePosition } = useEditor();
-  
+
   const {
     timelineClips,
     setTimelineClips,
@@ -64,19 +64,19 @@ const Timeline = () => {
 
   const handleTimelineClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!timelineContainerRef.current || isDraggingProgressBar) return;
-    
+
     const rect = timelineContainerRef.current.getBoundingClientRect();
     const clickX = e.clientX - rect.left;
     const progress = Math.max(0, Math.min(1, clickX / rect.width));
-    
+
     // Calculate total duration of all clips
     const totalDuration = timelineClips.reduce((acc, clip) => {
       const clipDuration = (clip.endTime ?? clip.originalDuration ?? 0) - (clip.startTime ?? 0);
       return acc + clipDuration;
     }, 0);
-    
+
     if (totalDuration === 0) return;
-    
+
     const targetTime = progress * totalDuration;
     seekToAbsoluteTime(targetTime);
   };
@@ -100,12 +100,12 @@ const Timeline = () => {
       if (isDraggingProgressBar && timelineContainerRef.current) {
         const rect = timelineContainerRef.current.getBoundingClientRect();
         const progress = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-        
+
         const totalDuration = timelineClips.reduce((acc, clip) => {
           const clipDuration = (clip.endTime ?? clip.originalDuration ?? 0) - (clip.startTime ?? 0);
           return acc + clipDuration;
         }, 0);
-        
+
         if (totalDuration > 0) {
           const targetTime = progress * totalDuration;
           seekToAbsoluteTime(targetTime);
@@ -175,11 +175,15 @@ const Timeline = () => {
   };
 
   const handleExport = async () => {
+    const isTauri = typeof window !== 'undefined' && '__TAURI__' in window;
+    const { audioPath } = useEditorStore.getState();
+
     if (timelineClips.length === 0) {
       toast.error("Cannot export.", { description: "Please add at least one video clip to the timeline." });
       return;
     }
-    if (!audioFile) {
+
+    if (!audioFile && !audioPath) {
       toast.error("Cannot export.", { description: "Please add an audio track." });
       return;
     }
@@ -190,44 +194,69 @@ const Timeline = () => {
       });
     }
 
-    const totalDuration = timelineClips.reduce((acc, clip) => {
-      const duration = (clip.endTime ?? clip.originalDuration ?? 0) - (clip.startTime ?? 0);
-      return acc + Math.max(0, duration);
-    }, 0);
-
-    if (totalDuration > 300) {
-      toast.info("Long export started...", {
-        description: "Exporting long videos can be memory intensive and may take a while. Please keep this tab open and active.",
-        duration: 8000
-      });
-    }
-
     setIsExporting(true);
     setExportProgress(0);
 
     try {
-      const outputBlob = await exportVideo({
-        ffmpeg: ffmpegRef.current,
-        timelineClips,
-        audioFile,
-        setExportProgress,
-      });
+      if (isTauri) {
+        // --- NATIVE EXPORT (TAURI) ---
+        const { save } = await import('@tauri-apps/plugin-dialog');
+        const { exportVideoNative } = await import('@/lib/nativeExport');
 
-      const url = URL.createObjectURL(outputBlob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'rVJ-export.mp4';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+        const outputPath = await save({
+          filters: [{ name: 'Video', extensions: ['mp4'] }],
+          defaultPath: 'rVJ-export.mp4'
+        });
 
-      toast.success("Export complete!", { description: "Your video has been downloaded." });
+        if (!outputPath) {
+          setIsExporting(false);
+          return;
+        }
 
+        await exportVideoNative(
+          timelineClips,
+          audioPath!,
+          outputPath,
+          (progress) => setExportProgress(progress)
+        );
+
+        toast.success("Export complete!", { description: `Video saved to ${outputPath}` });
+      } else {
+        // --- BROWSER EXPORT (FFMPEG.WASM) ---
+        const totalDuration = timelineClips.reduce((acc, clip) => {
+          const duration = (clip.endTime ?? clip.originalDuration ?? 0) - (clip.startTime ?? 0);
+          return acc + Math.max(0, duration);
+        }, 0);
+
+        if (totalDuration > 300) {
+          toast.info("Long export started...", {
+            description: "Exporting long videos can be memory intensive and may take a while. Please keep this tab open and active.",
+            duration: 8000
+          });
+        }
+
+        const outputBlob = await exportVideo({
+          ffmpeg: ffmpegRef.current,
+          timelineClips,
+          audioFile: audioFile!,
+          setExportProgress,
+        });
+
+        const url = URL.createObjectURL(outputBlob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'rVJ-export.mp4';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        toast.success("Export complete!", { description: "Your video has been downloaded." });
+      }
     } catch (error) {
       console.error("Export failed:", error);
       toast.error("Export failed.", {
-        description: "An error occurred during export. This can happen if video clips have different resolutions or formats. Check the console for details."
+        description: "An error occurred during export. Check the console for details."
       });
     } finally {
       setIsExporting(false);
@@ -258,8 +287,8 @@ const Timeline = () => {
           <TimelineRuler />
 
           {/* Enhanced playhead with scrubbing capability */}
-          <div 
-            className="absolute top-4 bottom-0 w-0.5 bg-primary z-30 shadow-lg cursor-ew-resize" 
+          <div
+            className="absolute top-4 bottom-0 w-0.5 bg-primary z-30 shadow-lg cursor-ew-resize"
             style={{ left: playheadPosition }}
             onMouseDown={handleProgressBarMouseDown}
           >

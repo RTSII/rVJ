@@ -8,13 +8,29 @@ import { MediaClip } from "@/types";
 const MediaLibrary = () => {
   const [mediaClips, setMediaClips] = useState<MediaClip[]>([]);
   const [thumbnailCache, setThumbnailCache] = useState<Record<string, string>>({});
+  const [loadingThumbnails, setLoadingThumbnails] = useState<Set<string>>(new Set());
   const videoInputRef = useRef<HTMLInputElement>(null);
   const audioInputRef = useRef<HTMLInputElement>(null);
   const dragItem = useRef<number | null>(null);
   const dragOverItem = useRef<number | null>(null);
   const { addClipToTimeline, loadAudio, setSelectedClip } = useEditorStore();
 
-  const generateThumbnail = (clip: MediaClip): Promise<string> => {
+  // Generate thumbnail - uses native FFmpeg in desktop mode, canvas in browser
+  const generateThumbnail = async (clip: MediaClip): Promise<string> => {
+    const isTauri = typeof window !== 'undefined' && '__TAURI__' in window;
+
+    // Desktop mode: use native FFmpeg for reliable thumbnail extraction
+    if (isTauri && clip.filePath) {
+      try {
+        const { generateNativeThumbnail } = await import('@/lib/desktop');
+        const thumbnail = await generateNativeThumbnail(clip.filePath, 0.5);
+        if (thumbnail) return thumbnail;
+      } catch (error) {
+        console.error('Native thumbnail failed, falling back to canvas:', error);
+      }
+    }
+
+    // Browser fallback: use video element + canvas
     return new Promise((resolve) => {
       const video = document.createElement('video');
       video.crossOrigin = "anonymous";
@@ -54,14 +70,22 @@ const MediaLibrary = () => {
     });
   };
 
+  // Generate thumbnails for new clips
   useEffect(() => {
     mediaClips.forEach(async (clip) => {
-      if (!thumbnailCache[clip.id]) {
+      if (!thumbnailCache[clip.id] && !loadingThumbnails.has(clip.id)) {
+        setLoadingThumbnails(prev => new Set(prev).add(clip.id));
         const thumbnail = await generateThumbnail(clip);
         setThumbnailCache(prev => ({ ...prev, [clip.id]: thumbnail }));
+        setLoadingThumbnails(prev => {
+          const next = new Set(prev);
+          next.delete(clip.id);
+          return next;
+        });
       }
     });
-  }, [mediaClips, thumbnailCache]);
+  }, [mediaClips]);
+
 
   const handleUploadVideoClick = async () => {
     // Check if running in Tauri desktop mode

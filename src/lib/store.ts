@@ -25,6 +25,7 @@ interface EditorState {
   absoluteTimelinePosition: number;
   isAudioMaster: boolean;
   trimmingClipId: string | null;
+  audioPath: string | null;
 }
 
 interface EditorActions {
@@ -80,6 +81,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   absoluteTimelinePosition: 0,
   isAudioMaster: true,
   trimmingClipId: null,
+  audioPath: null,
 
   addClip: (clip) => {
     const newClip: TimelineClip = {
@@ -162,10 +164,12 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   loadAudio: async (fileOrPath: File | string, assetUrl?: string) => {
     let audioUrl: string;
     let audioFile: File | null = null;
+    let audioPath: string | null = null;
 
     if (typeof fileOrPath === 'string') {
       // Tauri desktop mode: use provided asset URL
       audioUrl = assetUrl || fileOrPath;
+      audioPath = fileOrPath;
     } else {
       // Browser mode: create blob URL from File
       audioUrl = URL.createObjectURL(fileOrPath);
@@ -175,15 +179,67 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     set({
       audioFile: audioFile,
       audioUrl,
-      audioSrc: audioUrl
+      audioSrc: audioUrl,
+      audioPath
     });
 
-    // Generate basic waveform data
-    const mockWaveform = Array.from({ length: 100 }, () => Math.random());
-    set({
-      waveform: mockWaveform,
-      waveformData: mockWaveform
-    });
+    // Generate real waveform data from the audio file
+    try {
+      const isTauri = typeof window !== 'undefined' && '__TAURI__' in window;
+
+      if (isTauri && assetUrl) {
+        // Desktop mode: use the asset URL to generate waveform
+        const { generateWaveformFromPath } = await import('@/lib/desktop');
+        const waveform = await generateWaveformFromPath(assetUrl, 200);
+        set({
+          waveform,
+          waveformData: waveform
+        });
+      } else if (audioFile) {
+        // Browser mode: decode from File object
+        const arrayBuffer = await audioFile.arrayBuffer();
+        const audioContext = new AudioContext();
+        const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+
+        const rawData = audioBuffer.getChannelData(0);
+        const samples = 200;
+        const blockSize = Math.floor(rawData.length / samples);
+        const waveform: number[] = [];
+
+        for (let i = 0; i < samples; i++) {
+          let sum = 0;
+          for (let j = 0; j < blockSize; j++) {
+            sum += Math.abs(rawData[i * blockSize + j]);
+          }
+          waveform.push(sum / blockSize);
+        }
+
+        const max = Math.max(...waveform);
+        const normalizedWaveform = max > 0 ? waveform.map(v => v / max) : waveform;
+
+        set({
+          waveform: normalizedWaveform,
+          waveformData: normalizedWaveform
+        });
+
+        audioContext.close();
+      } else {
+        // Fallback to mock data
+        const mockWaveform = Array.from({ length: 200 }, () => Math.random());
+        set({
+          waveform: mockWaveform,
+          waveformData: mockWaveform
+        });
+      }
+    } catch (error) {
+      console.error('Waveform generation failed:', error);
+      // Fallback to mock data on error
+      const mockWaveform = Array.from({ length: 200 }, () => Math.random());
+      set({
+        waveform: mockWaveform,
+        waveformData: mockWaveform
+      });
+    }
   },
 
   setIsExporting: (isExporting) => set({ isExporting }),

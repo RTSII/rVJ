@@ -1,0 +1,55 @@
+﻿cargo :    Compiling tauri-plugin 
+v2.5.2
+At line:1 char:58
++ ...  
+";C:\Users\rtsii\.cargo\bin"; cd 
+src-tauri; cargo check 2>&1 | 
+Out-F ...
++                                 
+                 ~~~~~~~~~~~~~~~~
+    + CategoryInfo          : Not 
+   Specified: (   Compiling taur  
+  i-plugin v2.5.2:String) [], R   
+ emoteException
+    + FullyQualifiedErrorId : Nat 
+   iveCommandError
+ 
+   Compiling tauri-build v2.5.3
+    Checking webview2-com-sys 
+v0.38.2
+    Checking urlpattern v0.3.0
+    Checking tao v0.34.5
+   Compiling serde_repr v0.1.20
+   Compiling tauri-codegen v2.5.2
+    Checking window-vibrancy 
+v0.6.0
+    Checking muda v0.17.1
+   Compiling rfd v0.16.0
+    Checking shared_child v1.1.1
+   Compiling tauri-plugin-fs 
+v2.4.5
+   Compiling tauri-plugin-shell 
+v2.3.4
+   Compiling tauri-plugin-dialog 
+v2.6.0
+    Checking tauri-utils v2.8.1
+   Compiling tauri v2.9.5
+   Compiling rvj v0.1.0 (C:\Users\
+rtsii\Desktop\AI\Projects\All VJ 
+Projects\rVJ\src-tauri)
+   Compiling tauri-macros v2.5.2
+error: failed to remove C:\Users\r
+tsii\Desktop\AI\Projects\All VJ Pr
+ojects\rVJ\src-tauri\target\debug\
+deps\tauri_macros-08b7900fab370c82
+.tauri_macros.a85e67e3fff78893-cgu
+.1.rcgu.o: The process cannot 
+access the file because it is 
+being used by another process. 
+(os error 32)
+
+error: could not compile 
+`tauri-macros` (lib) due to 1 
+previous error
+warning: build failed, waiting 
+for other jobs to finish...
