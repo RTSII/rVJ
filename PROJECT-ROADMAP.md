@@ -1,6 +1,6 @@
 # rVJ Web App: Comprehensive Project Roadmap & Structure
 
-**Last Updated**: January 21, 2025 | **Version**: 68 | **Status**: Reality Check Complete - Accurate Current State Documented
+**Last Updated**: January 17, 2026 | **Version**: 69 | **Status**: Desktop Conversion Phase 5 Complete
 
 ---
 
@@ -186,7 +186,8 @@ rts-video-editor/
 ```json
 {
   "runtime": "Bun (package manager & execution)",
-  "framework": "Next.js 15.3.2 (App Router + Turbopack)",
+  "framework": "Vite 5.4 + React 18 (migrated from Next.js)",
+  "desktop": "Tauri 2.x (native Windows app with Rust backend)",
   "language": "TypeScript 5.8.3 (strict mode)",
   "ui": {
     "components": "shadcn/ui with Radix primitives",
@@ -196,9 +197,10 @@ rts-video-editor/
   },
   "state": "Zustand 5.0.5 (global state management)",
   "video": {
-    "export": "WebCodecs API + ffmpeg.wasm 0.12.15 fallback",
+    "export": "Native FFmpeg (desktop) + ffmpeg.wasm (web fallback)",
     "preloading": "Custom smart buffering system",
-    "effects": "Canvas API with CSS filters"
+    "effects": "Canvas API with CSS filters",
+    "thumbnails": "Native FFmpeg frame extraction"
   },
   "ai": "Supermemory 3.0.0-alpha.17 (universal memory with enhanced features)",
   "quality": {
@@ -210,6 +212,33 @@ rts-video-editor/
 ```
 
 ---
+
+## 🖥️ DESKTOP CONVERSION STATUS (January 2026)
+
+### **Current Status: Phase 5 Complete**
+
+rVJ is being converted from a web-only application to a **native Windows desktop application** using Tauri 2.x. This enables:
+
+- **Zero-buffering playback** of local video files (2+ hours supported)
+- **Native file dialogs** for browsing PC folders/files
+- **Real waveform generation** from audio files for timeline sync
+- **Native FFmpeg export** for fast video rendering
+- **Direct filesystem access** without browser limitations
+
+### **What's Working Now**
+| Feature | Status |
+|---------|--------|
+| Native video file selection | ✅ Implemented |
+| Native audio file selection | ✅ Implemented |
+| Real waveform visualization | ✅ Implemented |
+| Native thumbnail generation | ✅ Implemented |
+| Native FFmpeg export | ✅ Implemented |
+| Save file dialog | ✅ Implemented |
+| Browser fallback mode | ✅ Maintained |
+
+### **Next Steps**
+See `DESKTOP-TODO.md` for the complete remaining task list.
+
 
 ## 🎬 VIDEO PLAYBACK & PREVIEW ARCHITECTURE (Version 67-68)
 
