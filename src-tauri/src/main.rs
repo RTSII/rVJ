@@ -169,6 +169,58 @@ async fn generate_thumbnail(
     Ok(format!("data:image/png;base64,{}", base64_data))
 }
 
+// Command to generate a low-quality proxy video for fast preview
+#[tauri::command]
+async fn generate_proxy_video(
+    input_path: String,
+    output_path: String,
+    width: u32,
+    height: u32,
+    bitrate: String,
+    app_handle: tauri::AppHandle,
+) -> Result<String, String> {
+    // Resolve FFmpeg path
+    let ffmpeg_path = app_handle
+        .path()
+        .resolve("bin/ffmpeg.exe", tauri::path::BaseDirectory::Resource)
+        .map_err(|e| format!("Failed to resolve FFmpeg path: {}", e))?;
+
+    if !ffmpeg_path.exists() {
+        return Err(format!("FFmpeg binary not found at {:?}", ffmpeg_path));
+    }
+
+    // Ensure output directory exists
+    if let Some(parent) = std::path::Path::new(&output_path).parent() {
+        std::fs::create_dir_all(parent).map_err(|e| format!("Failed to create proxy dir: {}", e))?;
+    }
+
+    // FFmpeg command for generating proxy:
+    // - Scale to target resolution
+    // - Use fast encoding preset
+    // - Lower bitrate for smaller file size
+    let status = Command::new(&ffmpeg_path)
+        .args([
+            "-y",
+            "-i", &input_path,
+            "-vf", &format!("scale={}:{}:force_original_aspect_ratio=decrease,pad={}:{}:(ow-iw)/2:(oh-ih)/2", width, height, width, height),
+            "-c:v", "libx264",
+            "-preset", "ultrafast",
+            "-b:v", &bitrate,
+            "-c:a", "aac",
+            "-b:a", "96k",
+            "-movflags", "+faststart", // Enable fast start for streaming
+            &output_path,
+        ])
+        .status()
+        .map_err(|e| format!("FFmpeg proxy generation failed: {}", e))?;
+
+    if !status.success() {
+        return Err("FFmpeg proxy generation exited with error".to_string());
+    }
+
+    Ok(output_path)
+}
+
 fn main() {
     tauri::Builder::default()
         .plugin(tauri_plugin_fs::init())
@@ -178,7 +230,8 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             export_video,
             validate_file_path,
-            generate_thumbnail
+            generate_thumbnail,
+            generate_proxy_video
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

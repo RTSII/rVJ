@@ -1,6 +1,6 @@
 
 import { create } from 'zustand';
-import { TimelineClip } from '@/types';
+import { TimelineClip, PreviewQuality, ProxySettings } from '@/types';
 import { generateId } from './utils';
 
 interface EditorState {
@@ -26,6 +26,8 @@ interface EditorState {
   isAudioMaster: boolean;
   trimmingClipId: string | null;
   audioPath: string | null;
+  // Proxy video settings
+  proxySettings: ProxySettings;
 }
 
 interface EditorActions {
@@ -55,6 +57,10 @@ interface EditorActions {
 
   loadProject: (clips: TimelineClip[]) => void;
   clearTimeline: () => void;
+  // Proxy settings actions
+  setProxyQuality: (quality: PreviewQuality) => void;
+  setProxySettings: (settings: Partial<ProxySettings>) => void;
+  updateClipProxy: (clipId: string, proxyPath: string, proxyUrl: string) => void;
 }
 
 interface EditorStore extends EditorState, EditorActions { }
@@ -82,6 +88,13 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   isAudioMaster: true,
   trimmingClipId: null,
   audioPath: null,
+  // Default proxy settings: 480p, all storage options enabled
+  proxySettings: {
+    quality: '480p',
+    autoDelete: true,
+    manualClear: true,
+    useTempFolder: true,
+  },
 
   addClip: (clip) => {
     const newClip: TimelineClip = {
@@ -290,4 +303,26 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     waveform: [],
     audioMarkers: [],
   }),
+
+  // Proxy settings actions
+  setProxyQuality: (quality) => set((state) => ({
+    proxySettings: { ...state.proxySettings, quality }
+  })),
+
+  setProxySettings: (settings) => set((state) => ({
+    proxySettings: { ...state.proxySettings, ...settings }
+  })),
+
+  updateClipProxy: (clipId, proxyPath, proxyUrl) => set((state) => ({
+    clips: state.clips.map(clip =>
+      clip.id === clipId
+        ? { ...clip, proxyPath, proxyUrl, proxyReady: true }
+        : clip
+    ),
+    timelineClips: state.timelineClips.map(clip =>
+      clip.id === clipId
+        ? { ...clip, proxyPath, proxyUrl, proxyReady: true }
+        : clip
+    ),
+  })),
 }));

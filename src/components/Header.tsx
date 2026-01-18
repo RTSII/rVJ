@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Save, FileText, Settings } from "lucide-react";
 import UserMenu from "./UserMenu";
+import ProxySettings from "./ProxySettings";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface HeaderProps {
@@ -15,11 +16,11 @@ interface HeaderProps {
   onProjectNameChange: (name: string) => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ 
-  onShowProjects, 
-  onSaveProject, 
+export const Header: React.FC<HeaderProps> = ({
+  onShowProjects,
+  onSaveProject,
   currentProjectName,
-  onProjectNameChange 
+  onProjectNameChange
 }) => {
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const [projectName, setProjectName] = useState(currentProjectName);
@@ -57,7 +58,7 @@ export const Header: React.FC<HeaderProps> = ({
             {currentProjectName}
           </div>
         </div>
-        
+
         <div className="flex items-center space-x-4">
           <Button
             onClick={handleQuickSave}
@@ -68,7 +69,7 @@ export const Header: React.FC<HeaderProps> = ({
             <Save className="w-4 h-4 mr-2" />
             Save
           </Button>
-          
+
           <Dialog open={saveDialogOpen} onOpenChange={setSaveDialogOpen}>
             <DialogTrigger asChild>
               <Button
@@ -116,7 +117,9 @@ export const Header: React.FC<HeaderProps> = ({
               </DialogFooter>
             </DialogContent>
           </Dialog>
-          
+
+          <ProxySettings />
+
           <UserMenu onShowProjects={onShowProjects} />
         </div>
       </div>

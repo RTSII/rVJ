@@ -43,18 +43,21 @@ const VideoPreview = () => {
   const [bufferStalled, setBufferStalled] = React.useState(false);
   const lastBufferUpdate = React.useRef(Date.now());
 
-  // Monitor buffer health for current clip
+  // Monitor buffer health for current clip - using ref to avoid infinite loop
+  const getBufferHealthRef = React.useRef(getBufferHealth);
+  getBufferHealthRef.current = getBufferHealth;
+
   React.useEffect(() => {
     if (selectedClip) {
-      const health = getBufferHealth(selectedClip.id);
+      const health = getBufferHealthRef.current(selectedClip.id);
       setBufferHealth(health);
-
-      // Force buffer check when clip changes
-      forceBufferCheck();
     }
-  }, [selectedClip?.id, getBufferHealth, forceBufferCheck]);
+  }, [selectedClip?.id]); // Only re-run when clip changes, not on every render
 
-  // Enhanced buffering detection
+  // Enhanced buffering detection - using ref to avoid infinite loop
+  const forceBufferCheckRef = React.useRef(forceBufferCheck);
+  forceBufferCheckRef.current = forceBufferCheck;
+
   React.useEffect(() => {
     if (!videoRef.current || !selectedClip) return;
 
@@ -70,7 +73,7 @@ const VideoPreview = () => {
       stallTimeout = setTimeout(() => {
         console.warn("🎬 BUFFER: Video stalled for 3+ seconds");
         setBufferStalled(true);
-        forceBufferCheck();
+        forceBufferCheckRef.current();
       }, 3000);
     };
 
@@ -79,7 +82,6 @@ const VideoPreview = () => {
       setIsBuffering(false);
       setBufferStalled(false);
       if (stallTimeout) clearTimeout(stallTimeout);
-      forceBufferCheck();
     };
 
     const handleCanPlayThrough = () => {
@@ -87,14 +89,14 @@ const VideoPreview = () => {
       setIsBuffering(false);
       setBufferStalled(false);
       if (stallTimeout) clearTimeout(stallTimeout);
-      forceBufferCheck();
     };
 
     const handleProgress = () => {
       // Throttle buffer health updates
       const now = Date.now();
       if (now - lastBufferUpdate.current > 1000) {
-        forceBufferCheck();
+        const health = getBufferHealthRef.current(selectedClip.id);
+        setBufferHealth(health);
         lastBufferUpdate.current = now;
       }
     };
@@ -107,7 +109,6 @@ const VideoPreview = () => {
     const handleSeeked = () => {
       console.log("🎬 BUFFER: Video seek complete");
       setIsBuffering(false);
-      forceBufferCheck();
     };
 
     // Enhanced event listeners for better buffer monitoring
@@ -127,7 +128,8 @@ const VideoPreview = () => {
       video.removeEventListener('seeking', handleSeeking);
       video.removeEventListener('seeked', handleSeeked);
     };
-  }, [selectedClip?.id, forceBufferCheck]);
+  }, [selectedClip?.id]); // Only depends on clip ID now
+
 
   const handleTimeUpdate = () => {
     if (videoRef.current && selectedClip && !isTransitioning.current) {
@@ -263,7 +265,7 @@ const VideoPreview = () => {
           <>
             <video
               ref={videoRef}
-              src={selectedClip.src}
+              src={selectedClip.proxyUrl && selectedClip.proxyReady ? selectedClip.proxyUrl : selectedClip.src}
               className="w-full h-full object-contain"
               onTimeUpdate={handleTimeUpdate}
               onLoadedMetadata={handleLoadedMetadata}
@@ -305,10 +307,10 @@ const VideoPreview = () => {
             {selectedClip && (
               <div className="absolute top-2 right-2 flex items-center gap-2 text-xs text-white/90 bg-black/60 px-3 py-1.5 rounded-lg backdrop-blur-sm">
                 <div className={`w-2 h-2 rounded-full ${isPreloaded(selectedClip.id)
-                    ? 'bg-green-400 shadow-lg shadow-green-400/30'
-                    : bufferHealth > 50
-                      ? 'bg-yellow-400 shadow-lg shadow-yellow-400/30'
-                      : 'bg-red-400 shadow-lg shadow-red-400/30'
+                  ? 'bg-green-400 shadow-lg shadow-green-400/30'
+                  : bufferHealth > 50
+                    ? 'bg-yellow-400 shadow-lg shadow-yellow-400/30'
+                    : 'bg-red-400 shadow-lg shadow-red-400/30'
                   }`}></div>
                 <span className="font-medium">
                   {isPreloaded(selectedClip.id)
