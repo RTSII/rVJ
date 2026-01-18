@@ -24,13 +24,13 @@ const router = createBrowserRouter(
   createRoutesFromElements(
     <>
       <Route path="/auth" element={<Auth />} />
-      <Route 
-        path="/" 
+      <Route
+        path="/"
         element={
           <ProtectedRoute>
             <Index />
           </ProtectedRoute>
-        } 
+        }
       />
       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
       <Route path="*" element={<NotFound />} />

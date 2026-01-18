@@ -44,7 +44,8 @@
 ## 🔧 Remaining TODO
 
 ### Phase 6: Testing & Polish (Priority: HIGH)
-- [ ] Run `npm run tauri:dev` and verify application launches
+- [x] Run `npm run tauri:dev` and verify application launches
+- [x] Supabase authentication working (new project created)
 - [ ] Test native file dialog for video selection
 - [ ] Test native file dialog for audio selection
 - [ ] Verify waveform visualization displays correctly
