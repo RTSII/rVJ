@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Save, FileText } from "lucide-react";
 import UserMenu from "./UserMenu";
 import ProxySettings from "./ProxySettings";
+import AnimatedLogoSVG from "./AnimatedLogoSVG";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface HeaderProps {
@@ -41,9 +42,7 @@ export const Header: React.FC<HeaderProps> = ({
       <header className="relative bg-gradient-to-r from-[#0D0A1A] via-[#151022] to-[#0D0A1A] border-b border-purple-500/30 px-6 py-3 shadow-[0_4px_20px_rgba(168,85,247,0.2)]">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <h1 className="text-3xl font-bold gradient-text" style={{ fontFamily: 'Orbitron, sans-serif' }}>
-              RVJ
-            </h1>
+            <AnimatedLogoSVG size={48} />
           </div>
         </div>
       </header>
@@ -57,11 +56,8 @@ export const Header: React.FC<HeaderProps> = ({
 
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-6">
-          {/* Logo with glow */}
-          <h1 className="text-3xl font-bold gradient-text text-glow-cyan relative group" style={{ fontFamily: 'Orbitron, sans-serif' }}>
-            RVJ
-            <div className="absolute -bottom-1 left-0 right-0 h-[2px] bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
-          </h1>
+          {/* Animated Logo */}
+          <AnimatedLogoSVG size={48} className="hover:scale-110 transition-transform duration-300" />
 
           {/* Project name with cyber styling */}
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-purple-500/10 border border-purple-500/30 cyber-border">
