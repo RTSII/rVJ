@@ -1,6 +1,6 @@
 # rVJ Desktop Conversion - TODO List
 
-**Last Updated**: January 17, 2026 | **Status**: Alpha Launch Successful ✅
+**Last Updated**: January 18, 2026 | **Status**: Alpha Launch Successful ✅
 
 ---
 
@@ -43,18 +43,23 @@
 
 ## 🔧 Remaining TODO
 
-### Phase 6: Testing & Polish (Priority: HIGH)
+### Phase 6: Testing & Polish ✅
 - [x] Run `npm run tauri:dev` and verify application launches
 - [x] Supabase authentication working (new project created)
-- [ ] Test native file dialog for video selection
-- [ ] Test native file dialog for audio selection
-- [ ] Verify waveform visualization displays correctly
-- [ ] Verify video thumbnails generate correctly
-- [ ] Test video playback with `asset://` URLs
-- [ ] Test export functionality with multiple clips + audio
-- [ ] Test with 2+ hour video files to verify zero-buffering
+- [x] Test native file dialog for video selection
+- [x] Test native file dialog for audio selection
+- [x] Verify waveform visualization displays correctly
+- [x] Verify video thumbnails generate correctly
+- [x] Test video playback with `asset://` URLs
+- [x] Test export functionality with multiple clips + audio
+- [x] Test with 2+ hour video files to verify zero-buffering
 
-### Phase 7: Performance Optimization (Priority: MEDIUM)
+### Phase 7: UI/UX Refinement & Layout ✅
+- [x] Implement "Theater View" (Cinema mode) with ambient glow
+- [x] Move mode toggles (Cinema/Waves) to Header for better utility
+- [x] Fix vertical scrolling: 36/64 workspace split ensures 100% visibility
+- [x] Optimized waveform rendering: No vertical cutoff
+- [x] Collapsible Media Library with persistent "handle" tab
 - [ ] Implement video preloading for seamless clip transitions
 - [ ] Add memory usage monitoring and cleanup
 - [ ] Optimize thumbnail caching (persist between sessions)

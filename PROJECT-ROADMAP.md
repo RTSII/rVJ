@@ -1,6 +1,6 @@
 # rVJ Web App: Comprehensive Project Roadmap & Structure
 
-**Last Updated**: January 17, 2026 | **Version**: 71 | **Status**: Desktop Conversion - Application Launch Successful (Alpha)
+**Last Updated**: January 18, 2026 | **Version**: 72 | **Status**: Desktop Conversion - Application Launch Successful (Alpha)
 
 ---
 
@@ -234,6 +234,9 @@ rVJ is being converted from a web-only application to a **native Windows desktop
 | Native thumbnail generation | ✅ Implemented |
 | Native FFmpeg export | ✅ Implemented |
 | Save file dialog | ✅ Implemented |
+| **Theater View (Cinema Mode)** | ✅ Implemented |
+| **Header Mode Toggles** | ✅ Implemented |
+| **Workspace Layout Optimization** | ✅ Fixed (No Cutoffs) |
 | Browser fallback mode | ✅ Maintained |
 
 ### **Next Steps**
