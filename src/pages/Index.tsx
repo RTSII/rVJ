@@ -12,11 +12,15 @@ import { useProjects, Project } from "@/hooks/useProjects";
 import { useEditorStore } from "@/lib/store";
 import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const Index = () => {
   const [showProjects, setShowProjects] = useState(false);
   const [currentProjectId, setCurrentProjectId] = useState<string | null>(null);
   const [currentProjectName, setCurrentProjectName] = useState<string>('Untitled Project');
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [activeMode, setActiveMode] = useState<'video' | 'visualizer'>('video');
   const { saveProject, loadProject } = useProjects();
   const { clips, audioUrl, duration } = useEditorStore();
 
@@ -84,54 +88,92 @@ const Index = () => {
 
   return (
     <EditorProvider>
-      <div className="min-h-screen bg-gradient-to-br from-[#0D0A1A] via-[#151022] to-[#0D0A1A] text-foreground">
+      <div className="h-screen w-screen overflow-hidden bg-gradient-to-br from-[#0D0A1A] via-[#151022] to-[#0D0A1A] text-foreground flex flex-col">
         <Header
           onShowProjects={() => setShowProjects(true)}
           onSaveProject={handleSaveProject}
           currentProjectName={currentProjectName}
           onProjectNameChange={setCurrentProjectName}
-        />
-        <div className="flex h-[calc(100vh-4rem)]">
-          {/* Left Sidebar - Media Library */}
-          <div className="w-80 border-r border-purple-500/30 flex flex-col bg-gradient-to-b from-[#151022]/50 to-[#0D0A1A]/50 backdrop-blur-sm">
-            <MediaLibrary />
-            <WorkflowTutorial />
+        >
+          {/* Centered Mode Toggle in Header */}
+          <div className="flex bg-[#110C1D]/60 border border-purple-500/20 cyber-border h-9 p-1 rounded-md">
+            <button
+              onClick={() => setActiveMode('video')}
+              className={`px-6 py-1 text-xs uppercase tracking-widest font-bold transition-all rounded ${activeMode === 'video'
+                ? 'bg-cyan-500/20 text-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.2)]'
+                : 'text-muted-foreground hover:text-cyan-400/70'
+                }`}
+            >
+              Cinema
+            </button>
+            <button
+              onClick={() => setActiveMode('visualizer')}
+              className={`px-6 py-1 text-xs uppercase tracking-widest font-bold transition-all rounded ${activeMode === 'visualizer'
+                ? 'bg-purple-500/20 text-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.2)]'
+                : 'text-muted-foreground hover:text-purple-400/70'
+                }`}
+            >
+              Waves
+            </button>
+          </div>
+        </Header>
+        <div className="flex flex-1 overflow-hidden relative">
+          {/* Collapsible Left Sidebar - Media Library */}
+          <div
+            className={`border-r border-purple-500/30 flex flex-col bg-gradient-to-b from-[#151022]/50 to-[#0D0A1A]/50 backdrop-blur-sm overflow-hidden transition-all duration-300 ease-in-out ${sidebarCollapsed ? 'w-0' : 'w-60'
+              }`}
+            style={{ minWidth: sidebarCollapsed ? '0' : '240px' }}
+          >
+            <div className={`${sidebarCollapsed ? 'opacity-0' : 'opacity-100'} transition-opacity duration-200 h-full`}>
+              <MediaLibrary />
+            </div>
           </div>
 
+          {/* Persistent Expand/Collapse Toggle Tab */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className={`absolute top-1/2 -translate-y-1/2 h-16 w-4 z-50 rounded-r-md border border-l-0 border-purple-500/30 bg-[#151022]/90 backdrop-blur-md transition-all duration-300 ease-in-out hover:bg-purple-500/20 group hover:shadow-[0_0_15px_rgba(168,85,247,0.4)]`}
+            style={{
+              left: sidebarCollapsed ? '0' : '240px',
+              transition: 'left 0.3s ease-in-out'
+            }}
+            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+          >
+            <div className="flex items-center justify-center w-full h-full relative">
+              {sidebarCollapsed ? (
+                <ChevronRight className="h-4 w-4 text-cyan-400 group-hover:scale-125 transition-transform" />
+              ) : (
+                <ChevronLeft className="h-4 w-4 text-cyan-400 group-hover:scale-125 transition-transform" />
+              )}
+            </div>
+          </Button>
+
           {/* Main Content Area */}
-          <div className="flex-1 flex flex-col">
-            {/* Video Preview / Visualizer */}
-            <div className="flex-1 p-4">
-              <Tabs defaultValue="video" className="h-full flex flex-col">
-                <TabsList className="grid w-full grid-cols-2 bg-[#151022] border border-purple-500/30 cyber-border">
-                  <TabsTrigger
-                    value="video"
-                    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500/20 data-[state=active]:to-purple-500/20 data-[state=active]:text-cyan-400 data-[state=active]:border-b-2 data-[state=active]:border-cyan-400"
-                  >
-                    Video Preview
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="visualizer"
-                    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500/20 data-[state=active]:to-pink-500/20 data-[state=active]:text-pink-400 data-[state=active]:border-b-2 data-[state=active]:border-pink-400"
-                  >
-                    Audio Visualizer
-                  </TabsTrigger>
-                </TabsList>
-                <TabsContent value="video" className="flex-1 mt-4">
-                  <div className="h-full rounded-lg border border-purple-500/30 cyber-border-cyan overflow-hidden scanlines">
+          <div className="flex-1 flex flex-col overflow-hidden">
+            {/* Top Workspace - Theater View centered - 36% height */}
+            <div className="h-[36%] p-4 min-h-[220px] overflow-hidden bg-black/40 relative flex items-center justify-center">
+              {/* Theater Ambient Light Effects */}
+              <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-20">
+                <div className="absolute -top-[50%] left-1/4 w-[50%] h-[100%] bg-cyan-500/20 blur-[120px] rounded-full animate-pulse-slow"></div>
+                <div className="absolute -top-[50%] right-1/4 w-[50%] h-[100%] bg-purple-500/20 blur-[120px] rounded-full animate-pulse-slow" style={{ animationDelay: '1.5s' }}></div>
+              </div>
+
+              <div className="h-full w-full max-w-[1400px] flex items-center justify-center relative z-10">
+                {activeMode === 'video' ? (
+                  <div className="h-full aspect-video rounded-lg border border-purple-500/30 theater-shadow-cyan overflow-hidden scanlines relative bg-black shadow-[0_0_50px_-12px_rgba(34,211,238,0.3)] mx-auto">
                     <VideoPreview />
                   </div>
-                </TabsContent>
-                <TabsContent value="visualizer" className="flex-1 mt-4">
-                  <div className="h-full rounded-lg border border-purple-500/30 cyber-border overflow-hidden p-4 bg-[#151022]/50">
+                ) : (
+                  <div className="h-full aspect-video rounded-lg border border-purple-500/30 overflow-hidden p-3 bg-[#151022]/80 backdrop-blur-md shadow-[0_0_50px_-12px_rgba(168,85,247,0.3)] mx-auto">
                     <VisualizerPanel />
                   </div>
-                </TabsContent>
-              </Tabs>
+                )}
+              </div>
             </div>
 
-            {/* Timeline */}
-            <div className="h-64 border-t border-purple-500/30 bg-gradient-to-b from-[#151022]/80 to-[#0D0A1A]/80 backdrop-blur-sm">
+            {/* Bottom Workspace - Timeline - Balanced and constrained to remove scrollbar */}
+            <div className="flex-1 border-t border-purple-500/30 bg-gradient-to-b from-[#151022]/80 to-[#0D0A1A]/80 backdrop-blur-sm overflow-hidden flex flex-col">
               <Timeline />
             </div>
           </div>

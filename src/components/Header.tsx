@@ -15,13 +15,15 @@ interface HeaderProps {
   onSaveProject: (name?: string) => void;
   currentProjectName: string;
   onProjectNameChange: (name: string) => void;
+  children?: React.ReactNode;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   onShowProjects,
   onSaveProject,
   currentProjectName,
-  onProjectNameChange
+  onProjectNameChange,
+  children
 }) => {
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const [projectName, setProjectName] = useState(currentProjectName);
@@ -64,6 +66,11 @@ export const Header: React.FC<HeaderProps> = ({
             <FileText className="w-4 h-4 text-cyan-400" />
             <span className="text-sm font-medium text-foreground/90">{currentProjectName}</span>
           </div>
+        </div>
+
+        {/* Centered mode toggle children */}
+        <div className="absolute left-1/2 -translate-x-1/2 flex items-center h-full">
+          {children}
         </div>
 
         <div className="flex items-center space-x-3">

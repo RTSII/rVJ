@@ -28,6 +28,8 @@ interface EditorState {
   audioPath: string | null;
   // Proxy video settings
   proxySettings: ProxySettings;
+  // Timeline zoom
+  timelineZoom: number;
 }
 
 interface EditorActions {
@@ -61,6 +63,10 @@ interface EditorActions {
   setProxyQuality: (quality: PreviewQuality) => void;
   setProxySettings: (settings: Partial<ProxySettings>) => void;
   updateClipProxy: (clipId: string, proxyPath: string, proxyUrl: string) => void;
+  // Timeline zoom actions
+  setTimelineZoom: (zoom: number) => void;
+  zoomIn: () => void;
+  zoomOut: () => void;
 }
 
 interface EditorStore extends EditorState, EditorActions { }
@@ -95,6 +101,8 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     manualClear: true,
     useTempFolder: true,
   },
+  // Timeline zoom: 10 = full zoom out (long audio visible), 100 = 1:1, 500 = max zoom
+  timelineZoom: 50,
 
   addClip: (clip) => {
     const newClip: TimelineClip = {
@@ -324,5 +332,18 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
         ? { ...clip, proxyPath, proxyUrl, proxyReady: true }
         : clip
     ),
+  })),
+
+  // Timeline zoom actions (min 10%, max 500%)
+  setTimelineZoom: (zoom) => set({
+    timelineZoom: Math.min(500, Math.max(10, zoom))
+  }),
+
+  zoomIn: () => set((state) => ({
+    timelineZoom: Math.min(500, state.timelineZoom + 10)
+  })),
+
+  zoomOut: () => set((state) => ({
+    timelineZoom: Math.max(10, state.timelineZoom - 10)
   })),
 }));

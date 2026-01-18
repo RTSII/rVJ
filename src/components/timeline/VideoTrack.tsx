@@ -1,5 +1,5 @@
 
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { useEditorStore } from '@/lib/store';
 import { Button } from "@/components/ui/button";
 import { Video, GitMerge } from "lucide-react";
@@ -16,9 +16,9 @@ interface ThumbnailCache {
   [key: string]: string;
 }
 
-const PIXELS_PER_SECOND = 10;
+const MIN_CLIP_WIDTH = 60; // Minimum visible width
 const MIN_CLIP_DURATION = 0.5;
-const STANDARD_CLIP_WIDTH = 80;
+const PIXELS_PER_SECOND_BASE = 10; // At 100% zoom
 
 const VideoTrack: React.FC<VideoTrackProps> = ({
   dragItem,
@@ -26,7 +26,7 @@ const VideoTrack: React.FC<VideoTrackProps> = ({
   handleTimelineDragSort,
   handleToggleTransition,
 }) => {
-  const { timelineClips, selectedClip, setSelectedClip, trimmingClipId, setTrimmingClipId, updateClip } = useEditorStore();
+  const { timelineClips, selectedClip, setSelectedClip, trimmingClipId, setTrimmingClipId, updateClip, timelineZoom } = useEditorStore();
   const [draggingHandle, setDraggingHandle] = useState<'left' | 'right' | null>(null);
   const dragClipRef = useRef<MediaClip | null>(null);
   const dragStartRef = useRef({ x: 0, startTime: 0, endTime: 0 });
@@ -118,12 +118,12 @@ const VideoTrack: React.FC<VideoTrackProps> = ({
     if (timelineClips.length !== lastClipCount.current) {
       console.log("Checking for clips needing thumbnails, total clips:", timelineClips.length);
       lastClipCount.current = timelineClips.length;
-      
+
       // Only generate for clips that truly need thumbnails
       const clipsNeedingThumbnails = timelineClips.filter(
         clip => !thumbnailCache[clip.id] && !generatingThumbnails.current.has(clip.id) && clip.src
       );
-      
+
       // Generate thumbnails with a small delay to prevent flooding
       clipsNeedingThumbnails.forEach((clip, index) => {
         setTimeout(() => {
@@ -138,6 +138,7 @@ const VideoTrack: React.FC<VideoTrackProps> = ({
       if (!draggingHandle || !dragClipRef.current) return;
 
       const deltaX = e.clientX - dragStartRef.current.x;
+      const PIXELS_PER_SECOND = PIXELS_PER_SECOND_BASE * (timelineZoom / 100);
       const deltaTime = deltaX / PIXELS_PER_SECOND;
       const clip = dragClipRef.current;
 
@@ -176,29 +177,29 @@ const VideoTrack: React.FC<VideoTrackProps> = ({
   }
 
   return (
-    <div className="h-8 bg-secondary/30 rounded-md p-1 flex items-center gap-0.5">
-      <div className="w-4 h-full flex items-center justify-center bg-muted rounded flex-shrink-0">
-        <Video className="h-2 w-2 text-foreground" />
+    <div className="h-14 bg-[#151022]/40 rounded-lg p-1 flex items-center gap-1 border border-purple-500/10">
+      <div className="w-5 h-full flex items-center justify-center bg-purple-500/10 rounded flex-shrink-0 border border-purple-500/20">
+        <Video className="h-2.5 w-2.5 text-cyan-400" />
       </div>
       <div className="flex-1 h-full flex items-center gap-0.5">
         {timelineClips.map((clip, index) => (
           <React.Fragment key={clip.id}>
             {/* Show transition button only if the clip has a transition */}
             {index > 0 && clip.transition && (
-              <div className="w-2 h-full flex items-center justify-center flex-shrink-0">
+              <div className="w-4 h-full flex items-center justify-center flex-shrink-0">
                 <Button
                   size="icon"
                   variant="ghost"
-                  className="w-2 h-2 rounded-full hover:bg-primary/20"
+                  className="w-4 h-4 rounded-full hover:bg-primary/20"
                   onClick={() => handleToggleTransition(clip.id, clip.transition)}
                 >
-                  <GitMerge className="h-1 w-1 text-primary" />
+                  <GitMerge className="h-2 w-2 text-primary" />
                 </Button>
               </div>
             )}
             <div
               className="relative h-full flex-shrink-0 group"
-              style={{ width: `${STANDARD_CLIP_WIDTH}px` }}
+              style={{ width: `${Math.max(MIN_CLIP_WIDTH, ((clip.endTime ?? clip.originalDuration ?? 10) - (clip.startTime ?? 0)) * PIXELS_PER_SECOND_BASE * (timelineZoom / 100))}px` }}
             >
               <div
                 className={`w-full h-full rounded-sm relative overflow-hidden cursor-pointer active:cursor-grabbing border-2 ${selectedClip?.id === clip.id && !trimmingClipId ? 'border-primary bg-primary/20' : 'border-muted bg-muted'} hover:bg-primary/10 transition-colors`}
@@ -223,10 +224,10 @@ const VideoTrack: React.FC<VideoTrackProps> = ({
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center bg-muted/50">
-                    <Video className="h-3 w-3 text-muted-foreground" />
+                    <Video className="h-8 w-8 text-muted-foreground opacity-30" />
                   </div>
                 )}
-                <p className="absolute bottom-0 left-0 text-[6px] text-foreground bg-background/80 px-0.5 rounded-sm truncate pointer-events-none max-w-full">
+                <p className="absolute bottom-0 left-0 text-[10px] text-foreground bg-black/70 px-1 rounded-sm truncate pointer-events-none max-w-full font-medium">
                   {clip.file.name}
                 </p>
                 {/* Add transition button - only show on hover if no transition exists */}

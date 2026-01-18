@@ -7,6 +7,7 @@ import { useVideoPreloader } from "@/hooks/useVideoPreloader";
 import { useEditor } from "@/context/EditorContext";
 import { useEditorStore } from "@/lib/store";
 import { toast } from "sonner";
+import AnimatedLogoSVG from "./AnimatedLogoSVG";
 
 const VideoPreview = () => {
   const previewContainerRef = React.useRef<HTMLDivElement>(null);
@@ -335,58 +336,93 @@ const VideoPreview = () => {
                 <Button
                   size="icon"
                   variant="ghost"
-                  className="w-16 h-16 rounded-full bg-black/50 hover:bg-black/70 text-white pointer-events-auto"
+                  className="w-16 h-16 rounded-full bg-black/40 hover:bg-black/60 text-cyan-400 border border-cyan-500/30 backdrop-blur-md pointer-events-auto shadow-[0_0_20px_rgba(34,211,238,0.3)] transition-all hover:scale-110"
                   onClick={togglePlay}
                 >
-                  <Play className="h-8 w-8 ml-1" />
+                  <Play className="h-8 w-8 ml-1 fill-cyan-400" />
                 </Button>
               </div>
             )}
           </>
         ) : (
-          <div className="w-full h-full flex items-center justify-center flex-col gap-4">
-            <img
-              src="/lovable-uploads/68782036-637d-4eae-9d56-aeb41156f0bd.png"
-              alt="RVJ Logo"
-              className="w-1/3 h-1/3 object-contain opacity-50"
-            />
-            <div className="text-center text-muted-foreground">
-              <p className="text-lg font-medium">Select a clip to preview</p>
-              <p className="text-sm">Use Space to play/pause, J/L for -10s/+5s, ←/→ for -5s/+5s</p>
+          <div className="w-full h-full flex items-center justify-center flex-col bg-[#050505] relative group overflow-hidden">
+            {/* Cinematic Screening Placeholder */}
+            <div className="absolute inset-0 opacity-10 pointer-events-none">
+              <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-cyan-500 to-transparent"></div>
+              <div className="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-purple-500 to-transparent"></div>
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.9)_100%)]"></div>
+            </div>
+
+            <div className="relative transform transition-transform duration-1000 group-hover:scale-105 z-10">
+              <div className="absolute -inset-16 bg-cyan-500/10 blur-[100px] rounded-full opacity-40 group-hover:opacity-100 transition-opacity duration-1000"></div>
+              <AnimatedLogoSVG size={180} />
+            </div>
+
+            <div className="text-center z-10 mt-8 space-y-2">
+              <h3 className="text-xs uppercase tracking-[0.5em] font-black text-white/50">Theater Mode</h3>
+              <p className="text-[9px] text-cyan-400/60 uppercase tracking-[0.3em] font-mono font-bold animate-pulse">
+                Ready for screening
+              </p>
             </div>
           </div>
         )}
       </div>
-      <div className="p-2 bg-secondary/20 border-t border-border flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" onClick={jumpToStart} title="Jump to project start">
+
+      {/* Cinematic Control Bar */}
+      <div className="px-5 py-2 bg-[#0D0A1A]/95 border-t border-white/5 flex items-center justify-between backdrop-blur-2xl">
+        <div className="flex items-center gap-1">
+          <Button variant="ghost" size="icon" className="h-7 w-7 text-white/40 hover:text-white/100 hover:bg-white/5" onClick={jumpToStart} title="Jump to project start">
             <Rewind className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" onClick={togglePlay} title="Play/Pause (Space)">
-            {videoIsPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-cyan-400 hover:bg-cyan-500/10" onClick={togglePlay} title="Play/Pause (Space)">
+            {videoIsPlaying ? <Pause className="h-5 w-5 fill-cyan-400" /> : <Play className="h-5 w-5 fill-cyan-400" />}
           </Button>
-          <Button variant="ghost" size="icon" onClick={jumpToEnd} title="Jump to clip end">
+          <Button variant="ghost" size="icon" className="h-7 w-7 text-white/40 hover:text-white/100 hover:bg-white/5" onClick={jumpToEnd} title="Jump to clip end">
             <FastForward className="h-4 w-4" />
           </Button>
         </div>
-        <div className="flex-1 mx-4">
+
+        <div className="flex-1 mx-6 group/progress relative px-2">
           <div
-            className="w-full bg-muted h-1.5 rounded-full overflow-hidden cursor-pointer"
+            className="w-full bg-white/5 h-1 rounded-full cursor-pointer relative overflow-visible"
             onClick={handleProgressBarClick}
           >
-            <div className="bg-primary h-full transition-all duration-100" style={{ width: `${progressPercentage}%` }}></div>
+            {/* Playback Progress */}
+            <div
+              className="absolute left-0 top-0 h-full bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full transition-all duration-150"
+              style={{ width: `${progressPercentage}%` }}
+            >
+              <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 bg-white rounded-full shadow-[0_0_10px_rgba(255,255,255,0.8)] opacity-0 group-hover/progress:opacity-100 transition-opacity"></div>
+            </div>
+
+            {/* Hover Indicator */}
+            <div className="absolute inset-0 h-full bg-white/5 opacity-0 group-hover/progress:opacity-100 transition-opacity"></div>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-muted-foreground font-mono">
-            {formatTime(currentTime)} / {formatTime(clipDisplayDuration)}
-          </span>
-          {totalClips > 0 && (
-            <span className="text-xs text-muted-foreground">({currentClipIndex}/{totalClips})</span>
-          )}
-          <Button variant="ghost" size="icon" onClick={toggleFullScreen} title="Fullscreen">
-            <Expand className="h-4 w-4" />
-          </Button>
+
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-mono font-bold text-cyan-400 bg-cyan-500/5 px-2 py-0.5 rounded border border-cyan-500/10">
+              {formatTime(currentTime)}
+            </span>
+            <span className="text-[10px] font-mono text-white/20">/</span>
+            <span className="text-[10px] font-mono text-white/40">
+              {formatTime(clipDisplayDuration)}
+            </span>
+          </div>
+
+          <div className="h-4 w-[1px] bg-white/10 mx-1"></div>
+
+          <div className="flex items-center gap-1">
+            {totalClips > 0 && (
+              <span className="text-[9px] font-bold text-white/30 uppercase tracking-tighter mr-2">
+                Clip {currentClipIndex}<span className="text-white/10 mx-0.5">/</span>{totalClips}
+              </span>
+            )}
+            <Button variant="ghost" size="icon" className="h-7 w-7 text-white/40 hover:text-white/100 hover:bg-white/5" onClick={toggleFullScreen} title="Fullscreen">
+              <Expand className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </div>
     </div>

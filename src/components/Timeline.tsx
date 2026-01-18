@@ -38,6 +38,8 @@ const Timeline = () => {
     setAudioMarkers,
     selectedClip,
     absoluteTimelinePosition,
+    timelineZoom,
+    setTimelineZoom,
   } = useEditorStore();
 
   const dragItem = useRef<number | null>(null);
@@ -86,6 +88,24 @@ const Timeline = () => {
     setIsDraggingProgressBar(true);
     handleTimelineClick(e);
   };
+
+  // Mouse wheel zoom handler (Ctrl/Cmd + Scroll)
+  useEffect(() => {
+    const container = timelineContainerRef.current;
+    if (!container) return;
+
+    const handleWheel = (e: WheelEvent) => {
+      if (e.ctrlKey || e.metaKey) {
+        e.preventDefault();
+        const delta = e.deltaY > 0 ? -10 : 10;
+        const newZoom = Math.min(500, Math.max(10, timelineZoom + delta));
+        setTimelineZoom(newZoom);
+      }
+    };
+
+    container.addEventListener('wheel', handleWheel, { passive: false });
+    return () => container.removeEventListener('wheel', handleWheel);
+  }, [timelineZoom, setTimelineZoom]);
 
   useEffect(() => {
     return () => {
@@ -269,16 +289,16 @@ const Timeline = () => {
     <Card className="flex flex-col h-full bg-card/50 border border-border/50 shadow-sm overflow-hidden">
       {audioSrc && <audio ref={audioRef} src={audioSrc} />}
       <TimelineControls handleExport={handleExport} />
-      <CardContent className="p-3 pt-2 flex-1 min-h-0 overflow-hidden">
+      <CardContent className="p-2 pt-1 flex-1 min-h-0 overflow-hidden flex flex-col">
         {isExporting && (
-          <div className="mb-3 p-3 bg-secondary/20 border border-border/30 rounded-lg space-y-2">
+          <div className="mb-2 p-2 bg-secondary/20 border border-border/30 rounded-lg space-y-1">
             <p className="text-sm text-foreground font-medium text-center">Exporting Video...</p>
             <Progress value={exportProgress} className="w-full h-2" />
             <p className="text-xs text-muted-foreground text-center">{Math.round(exportProgress)}% complete</p>
           </div>
         )}
         <div
-          className="relative min-w-[600px] h-full overflow-x-auto overflow-y-hidden cursor-pointer bg-background/30 border border-border/30 rounded-lg"
+          className="relative flex-1 min-h-0 overflow-hidden flex flex-col bg-background/30 border border-border/30 rounded-lg"
           onDrop={handleDropOnTimeline}
           onDragOver={(e) => e.preventDefault()}
           onClick={handleTimelineClick}
@@ -296,15 +316,17 @@ const Timeline = () => {
             <div className="absolute top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary via-primary/80 to-primary/60"></div>
           </div>
 
-          {/* Tracks */}
-          <div className="space-y-1 mt-1">
-            <AudioTrack duration={duration} setDraggingMarkerIndex={setDraggingMarkerIndex} />
-            <VideoTrack
-              dragItem={dragItem}
-              dragOverItem={dragOverItem}
-              handleTimelineDragSort={handleTimelineDragSort}
-              handleToggleTransition={handleToggleTransition}
-            />
+          {/* Tracks - Video clips ABOVE audio waveform - with proper overflow */}
+          <div className="flex-1 min-h-0 overflow-y-hidden overflow-x-auto px-2 pb-1">
+            <div className="space-y-1 mt-1">
+              <VideoTrack
+                dragItem={dragItem}
+                dragOverItem={dragOverItem}
+                handleTimelineDragSort={handleTimelineDragSort}
+                handleToggleTransition={handleToggleTransition}
+              />
+              <AudioTrack duration={duration} setDraggingMarkerIndex={setDraggingMarkerIndex} />
+            </div>
           </div>
         </div>
       </CardContent>

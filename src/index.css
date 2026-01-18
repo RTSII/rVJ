@@ -7,42 +7,59 @@
 @layer base {
   :root {
     /* Vaporwave Cyberpunk Palette - Derived from RVJ Logo */
-    --background: 267 50% 4%;           /* #0D0A1A - Deep purple-black */
-    --foreground: 210 30% 95%;          /* #F0F4FA - Light text */
+    --background: 267 50% 4%;
+    /* #0D0A1A - Deep purple-black */
+    --foreground: 210 30% 95%;
+    /* #F0F4FA - Light text */
 
-    --card: 265 40% 8%;                 /* #151022 - Card background */
+    --card: 265 40% 8%;
+    /* #151022 - Card background */
     --card-foreground: 210 30% 95%;
 
     --popover: 265 40% 8%;
     --popover-foreground: 210 30% 95%;
 
-    --primary: 185 100% 50%;            /* #00F0FF - Neon Cyan */
+    --primary: 185 100% 50%;
+    /* #00F0FF - Neon Cyan */
     --primary-foreground: 267 50% 4%;
 
-    --secondary: 320 100% 60%;          /* #FF2D92 - Neon Magenta */
+    --secondary: 320 100% 60%;
+    /* #FF2D92 - Neon Magenta */
     --secondary-foreground: 210 30% 95%;
 
-    --muted: 263 35% 12%;               /* #1E1632 - Muted purple */
-    --muted-foreground: 220 15% 60%;    /* #8B92A8 - Muted text */
+    --muted: 263 35% 12%;
+    /* #1E1632 - Muted purple */
+    --muted-foreground: 220 15% 60%;
+    /* #8B92A8 - Muted text */
 
-    --accent: 280 80% 55%;              /* #A855F7 - Purple accent */
+    --accent: 280 80% 55%;
+    /* #A855F7 - Purple accent */
     --accent-foreground: 210 30% 95%;
 
-    --destructive: 0 85% 60%;           /* #FF3333 - Bright red */
+    --destructive: 0 85% 60%;
+    /* #FF3333 - Bright red */
     --destructive-foreground: 210 30% 95%;
 
-    --border: 280 50% 20%;              /* #4A2B66 - Purple border */
-    --input: 265 40% 12%;               /* #1A1228 - Input background */
-    --ring: 185 100% 50%;               /* Cyan ring */
+    --border: 280 50% 20%;
+    /* #4A2B66 - Purple border */
+    --input: 265 40% 12%;
+    /* #1A1228 - Input background */
+    --ring: 185 100% 50%;
+    /* Cyan ring */
 
     --radius: 0.5rem;
 
     /* Custom Neon Colors */
-    --neon-cyan: 185 100% 50%;          /* #00F0FF */
-    --neon-magenta: 320 100% 60%;       /* #FF2D92 */
-    --neon-pink: 330 90% 65%;           /* #FF4D8D */
-    --neon-purple: 280 80% 55%;         /* #A855F7 */
-    --matrix-green: 155 100% 45%;       /* #00E676 */
+    --neon-cyan: 185 100% 50%;
+    /* #00F0FF */
+    --neon-magenta: 320 100% 60%;
+    /* #FF2D92 */
+    --neon-pink: 330 90% 65%;
+    /* #FF4D8D */
+    --neon-purple: 280 80% 55%;
+    /* #A855F7 */
+    --matrix-green: 155 100% 45%;
+    /* #00E676 */
 
     /* Glow intensities */
     --glow-intensity: 0.4;
@@ -76,67 +93,75 @@
   * {
     @apply border-border;
   }
-  
+
   body {
     @apply bg-background text-foreground;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-family: 'Space Grotesk', sans-serif;
     font-weight: 600;
   }
 
-  code, pre, .mono {
+  code,
+  pre,
+  .mono {
     font-family: 'JetBrains Mono', 'Courier New', monospace;
   }
 }
 
 @layer utilities {
+
   /* Neon Glow Effects */
   .glow-cyan {
-    box-shadow: 
+    box-shadow:
       0 0 var(--glow-spread) hsl(var(--neon-cyan) / var(--glow-intensity)),
       0 0 calc(var(--glow-spread) * 2) hsl(var(--neon-cyan) / calc(var(--glow-intensity) / 2)),
       inset 0 0 var(--glow-spread) hsl(var(--neon-cyan) / 0.1);
   }
 
   .glow-magenta {
-    box-shadow: 
+    box-shadow:
       0 0 var(--glow-spread) hsl(var(--neon-magenta) / var(--glow-intensity)),
       0 0 calc(var(--glow-spread) * 2) hsl(var(--neon-magenta) / calc(var(--glow-intensity) / 2)),
       inset 0 0 var(--glow-spread) hsl(var(--neon-magenta) / 0.1);
   }
 
   .glow-pink {
-    box-shadow: 
+    box-shadow:
       0 0 var(--glow-spread) hsl(var(--neon-pink) / var(--glow-intensity)),
       0 0 calc(var(--glow-spread) * 2) hsl(var(--neon-pink) / calc(var(--glow-intensity) / 2));
   }
 
   .glow-purple {
-    box-shadow: 
+    box-shadow:
       0 0 var(--glow-spread) hsl(var(--neon-purple) / var(--glow-intensity)),
       0 0 calc(var(--glow-spread) * 2) hsl(var(--neon-purple) / calc(var(--glow-intensity) / 2));
   }
 
   .glow-matrix {
-    box-shadow: 
+    box-shadow:
       0 0 var(--glow-spread) hsl(var(--matrix-green) / var(--glow-intensity)),
       0 0 calc(var(--glow-spread) * 2) hsl(var(--matrix-green) / calc(var(--glow-intensity) / 2));
   }
 
   /* Text glow */
   .text-glow-cyan {
-    text-shadow: 
+    text-shadow:
       0 0 10px hsl(var(--neon-cyan) / 0.8),
       0 0 20px hsl(var(--neon-cyan) / 0.4),
       0 0 30px hsl(var(--neon-cyan) / 0.2);
   }
 
   .text-glow-magenta {
-    text-shadow: 
+    text-shadow:
       0 0 10px hsl(var(--neon-magenta) / 0.8),
       0 0 20px hsl(var(--neon-magenta) / 0.4),
       0 0 30px hsl(var(--neon-magenta) / 0.2);
@@ -145,14 +170,14 @@
   /* Cyber Border */
   .cyber-border {
     border: 1px solid hsl(var(--neon-magenta) / 0.3);
-    box-shadow: 
+    box-shadow:
       inset 0 0 20px hsl(var(--neon-magenta) / 0.1),
       0 0 10px hsl(var(--neon-magenta) / 0.2);
   }
 
   .cyber-border-cyan {
     border: 1px solid hsl(var(--neon-cyan) / 0.3);
-    box-shadow: 
+    box-shadow:
       inset 0 0 20px hsl(var(--neon-cyan) / 0.1),
       0 0 10px hsl(var(--neon-cyan) / 0.2);
   }
@@ -166,13 +191,11 @@
     content: '';
     position: absolute;
     inset: 0;
-    background: repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 2px,
-      rgba(0, 0, 0, 0.1) 2px,
-      rgba(0, 0, 0, 0.1) 4px
-    );
+    background: repeating-linear-gradient(0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 0, 0, 0.1) 2px,
+        rgba(0, 0, 0, 0.1) 4px);
     pointer-events: none;
     opacity: 0.3;
   }
@@ -190,14 +213,12 @@
     inset: 0;
     border-radius: var(--radius);
     padding: 1px;
-    background: linear-gradient(
-      135deg,
-      hsl(var(--neon-cyan)),
-      hsl(var(--neon-purple)),
-      hsl(var(--neon-magenta))
-    );
-    -webkit-mask: 
-      linear-gradient(#fff 0 0) content-box, 
+    background: linear-gradient(135deg,
+        hsl(var(--neon-cyan)),
+        hsl(var(--neon-purple)),
+        hsl(var(--neon-magenta)));
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
       linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
@@ -239,12 +260,15 @@
       transform: translateY(-100%);
       opacity: 0;
     }
+
     10% {
       opacity: 1;
     }
+
     90% {
       opacity: 1;
     }
+
     100% {
       transform: translateY(100vh);
       opacity: 0;
@@ -257,13 +281,16 @@
 
   /* Pulse Glow Animation */
   @keyframes pulse-glow {
-    0%, 100% {
-      box-shadow: 
+
+    0%,
+    100% {
+      box-shadow:
         0 0 10px hsl(var(--neon-cyan) / 0.4),
         0 0 20px hsl(var(--neon-cyan) / 0.2);
     }
+
     50% {
-      box-shadow: 
+      box-shadow:
         0 0 20px hsl(var(--neon-cyan) / 0.6),
         0 0 40px hsl(var(--neon-cyan) / 0.3),
         0 0 60px hsl(var(--neon-cyan) / 0.1);
@@ -276,14 +303,46 @@
 
   /* Gradient Text */
   .gradient-text {
-    background: linear-gradient(
-      135deg,
-      hsl(var(--neon-cyan)),
-      hsl(var(--neon-purple)),
-      hsl(var(--neon-magenta))
-    );
+    background: linear-gradient(135deg,
+        hsl(var(--neon-cyan)),
+        hsl(var(--neon-purple)),
+        hsl(var(--neon-magenta)));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+  }
+
+  /* Theater / Cinema View Utilities */
+  .theater-shadow-cyan {
+    box-shadow:
+      0 30px 60px -12px rgba(0, 0, 0, 1),
+      0 18px 36px -18px rgba(34, 211, 238, 0.5),
+      0 0 40px -10px rgba(34, 211, 238, 0.2);
+  }
+
+  .theater-shadow-purple {
+    box-shadow:
+      0 30px 60px -12px rgba(0, 0, 0, 1),
+      0 18px 36px -18px rgba(168, 85, 247, 0.5),
+      0 0 40px -10px rgba(168, 85, 247, 0.2);
+  }
+
+  /* Slow Ambient Pulse */
+  @keyframes pulse-slow {
+
+    0%,
+    100% {
+      opacity: 0.1;
+      transform: scale(1);
+    }
+
+    50% {
+      opacity: 0.3;
+      transform: scale(1.1);
+    }
+  }
+
+  .animate-pulse-slow {
+    animation: pulse-slow 6s ease-in-out infinite;
   }
 }
