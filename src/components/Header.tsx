@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Save, FileText, Settings } from "lucide-react";
+import { Save, FileText } from "lucide-react";
 import UserMenu from "./UserMenu";
 import ProxySettings from "./ProxySettings";
 import { useAuth } from "@/contexts/AuthContext";
@@ -38,10 +38,12 @@ export const Header: React.FC<HeaderProps> = ({
 
   if (!user) {
     return (
-      <header className="bg-slate-800 border-b border-slate-700 px-6 py-4">
+      <header className="relative bg-gradient-to-r from-[#0D0A1A] via-[#151022] to-[#0D0A1A] border-b border-purple-500/30 px-6 py-3 shadow-[0_4px_20px_rgba(168,85,247,0.2)]">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <h1 className="text-2xl font-bold text-white">RVJ</h1>
+            <h1 className="text-3xl font-bold gradient-text" style={{ fontFamily: 'Orbitron, sans-serif' }}>
+              RVJ
+            </h1>
           </div>
         </div>
       </header>
@@ -49,54 +51,63 @@ export const Header: React.FC<HeaderProps> = ({
   }
 
   return (
-    <header className="bg-slate-800 border-b border-slate-700 px-6 py-4">
+    <header className="relative bg-gradient-to-r from-[#0D0A1A] via-[#151022] to-[#0D0A1A] border-b border-purple-500/30 px-6 py-3 shadow-[0_4px_20px_rgba(168,85,247,0.2)]">
+      {/* Animated gradient line */}
+      <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent opacity-50"></div>
+
       <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <h1 className="text-2xl font-bold text-white">RVJ</h1>
-          <div className="text-slate-400">
-            <FileText className="w-4 h-4 inline mr-2" />
-            {currentProjectName}
+        <div className="flex items-center space-x-6">
+          {/* Logo with glow */}
+          <h1 className="text-3xl font-bold gradient-text text-glow-cyan relative group" style={{ fontFamily: 'Orbitron, sans-serif' }}>
+            RVJ
+            <div className="absolute -bottom-1 left-0 right-0 h-[2px] bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+          </h1>
+
+          {/* Project name with cyber styling */}
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-purple-500/10 border border-purple-500/30 cyber-border">
+            <FileText className="w-4 h-4 text-cyan-400" />
+            <span className="text-sm font-medium text-foreground/90">{currentProjectName}</span>
           </div>
         </div>
 
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-3">
+          {/* Quick Save Button */}
           <Button
             onClick={handleQuickSave}
-            variant="outline"
+            variant="default"
             size="sm"
-            className="border-slate-600 text-slate-300 hover:bg-slate-700"
           >
             <Save className="w-4 h-4 mr-2" />
             Save
           </Button>
 
+          {/* Save As Dialog */}
           <Dialog open={saveDialogOpen} onOpenChange={setSaveDialogOpen}>
             <DialogTrigger asChild>
               <Button
                 variant="outline"
                 size="sm"
-                className="border-slate-600 text-slate-300 hover:bg-slate-700"
                 onClick={() => setProjectName(currentProjectName)}
               >
                 Save As
               </Button>
             </DialogTrigger>
-            <DialogContent className="bg-slate-800 border-slate-700">
+            <DialogContent className="bg-[#151022] border-purple-500/30 cyber-border">
               <DialogHeader>
-                <DialogTitle className="text-white">Save Project</DialogTitle>
-                <DialogDescription className="text-slate-300">
+                <DialogTitle className="text-xl gradient-text">Save Project</DialogTitle>
+                <DialogDescription className="text-muted-foreground">
                   Enter a name for your project
                 </DialogDescription>
               </DialogHeader>
-              <div className="space-y-4">
+              <div className="space-y-4 py-4">
                 <div className="space-y-2">
-                  <Label htmlFor="project-name" className="text-slate-300">Project Name</Label>
+                  <Label htmlFor="project-name" className="text-foreground/90">Project Name</Label>
                   <Input
                     id="project-name"
                     value={projectName}
                     onChange={(e) => setProjectName(e.target.value)}
                     placeholder="Enter project name"
-                    className="bg-slate-700 border-slate-600 text-white"
+                    className="bg-[#1A1228] border-purple-500/30 text-foreground focus:border-cyan-400 focus:ring-cyan-400/20"
                   />
                 </div>
               </div>
@@ -104,13 +115,12 @@ export const Header: React.FC<HeaderProps> = ({
                 <Button
                   variant="outline"
                   onClick={() => setSaveDialogOpen(false)}
-                  className="border-slate-600 text-slate-300"
                 >
                   Cancel
                 </Button>
                 <Button
                   onClick={handleSaveProject}
-                  className="bg-purple-600 hover:bg-purple-700"
+                  variant="default"
                 >
                   Save Project
                 </Button>
