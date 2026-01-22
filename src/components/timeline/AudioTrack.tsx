@@ -1,7 +1,6 @@
-
 import React, { useRef, useEffect, useMemo } from 'react';
 import { useEditorStore } from '@/lib/store';
-import { AudioWaveform, MapPin } from 'lucide-react';
+import { AudioWaveform, MapPin, VolumeX } from 'lucide-react';
 
 interface AudioTrackProps {
   duration: number;
@@ -20,7 +19,7 @@ const VERTICAL_PADDING = 3; // Reduced padding
 const AudioTrack: React.FC<AudioTrackProps> = ({ duration, setDraggingMarkerIndex }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const { waveform, audioMarkers, timelineZoom } = useEditorStore();
+  const { waveform, audioMarkers, timelineZoom, isAudioMuted, toggleAudioMute } = useEditorStore();
 
   // Calculate canvas width based on duration and zoom level
   const canvasWidth = useMemo(() => {
@@ -53,72 +52,96 @@ const AudioTrack: React.FC<AudioTrackProps> = ({ duration, setDraggingMarkerInde
     // Clear canvas
     context.clearRect(0, 0, width, height);
 
-    const barWidth = Math.max(1, width / waveform.length);
+    const barWidth = Math.max(1, width / (waveform.length / 3)); // Divide by 3 since data is interleaved
     const centerY = height / 2;
 
-    // Simulate 3-band frequency split (since we only have amplitude data)
-    // Low = original * 0.7, Mid = original * 1.0, High = original * 0.5
-    waveform.forEach((val, i) => {
+    // Extract real frequency bands from interleaved data
+    // Data format: [low, mid, high, low, mid, high, ...]
+    const numSamples = waveform.length / 3;
+
+    for (let i = 0; i < numSamples; i++) {
       const x = i * barWidth;
+      const idx = i * 3;
 
-      // Normalize and scale amplitude (ensure it fits within drawHeight with padding)
-      const normalizedVal = Math.min(1, val * 1.2); // Slight boost for visibility
+      // Extract real frequency values (already normalized)
+      const lowVal = waveform[idx] || 0;
+      const midVal = waveform[idx + 1] || 0;
+      const highVal = waveform[idx + 2] || 0;
 
-      // Calculate band heights (stacked from center)
-      const lowHeight = normalizedVal * drawHeight * 0.35;
-      const midHeight = normalizedVal * drawHeight * 0.45;
-      const highHeight = normalizedVal * drawHeight * 0.2;
+      // Calculate band heights based on REAL frequency analysis
+      const lowHeight = lowVal * drawHeight * 0.4; // Bass gets 40% of height potential
+      const midHeight = midVal * drawHeight * 0.45; // Mids get 45%
+      const highHeight = highVal * drawHeight * 0.3; // Treble gets 30%
 
-      // Draw low frequency (magenta) - bottom portion
+      // Draw low frequency (magenta) - bottom portion, mirrored
       context.fillStyle = FREQ_COLORS.low;
       context.fillRect(
         x,
-        centerY + (lowHeight / 2) - lowHeight,
+        centerY - (lowHeight / 2),
         barWidth * 0.85,
-        lowHeight
+        lowHeight / 2
       );
       context.fillRect(
         x,
         centerY,
         barWidth * 0.85,
-        lowHeight
+        lowHeight / 2
       );
 
       // Draw mid frequency (purple) - middle portion
       context.fillStyle = FREQ_COLORS.mid;
+      const midStart = centerY - (lowHeight / 2) - (midHeight / 2);
       context.fillRect(
         x,
-        centerY - (midHeight / 2),
+        midStart,
         barWidth * 0.85,
-        midHeight
+        midHeight / 2
+      );
+      context.fillRect(
+        x,
+        centerY + (lowHeight / 2),
+        barWidth * 0.85,
+        midHeight / 2
       );
 
       // Draw high frequency (cyan) - top/bottom tips
       context.fillStyle = FREQ_COLORS.high;
-      const totalHeight = (lowHeight + midHeight + highHeight) / 2;
+      const highStartTop = centerY - (lowHeight / 2) - (midHeight / 2) - (highHeight / 2);
       context.fillRect(
         x,
-        centerY - totalHeight - (highHeight / 4),
+        highStartTop,
         barWidth * 0.85,
         highHeight / 2
       );
+      const highStartBottom = centerY + (lowHeight / 2) + (midHeight / 2);
       context.fillRect(
         x,
-        centerY + totalHeight - (highHeight / 4),
+        highStartBottom,
         barWidth * 0.85,
         highHeight / 2
       );
-    });
+    }
 
     console.log("Multi-color waveform drawn successfully");
   }, [waveform, canvasWidth]);
 
   return (
     <div className="h-10 bg-gradient-to-r from-[#151022]/60 to-[#0D0A1A]/60 rounded-lg py-0.5 px-1 flex items-center gap-1 border border-purple-500/20">
-      {/* Track label */}
-      <div className="w-5 h-full flex items-center justify-center bg-gradient-to-b from-magenta-500/20 to-purple-500/20 rounded-md flex-shrink-0 border border-purple-500/30">
-        <AudioWaveform className="h-2.5 w-2.5 text-cyan-400" />
-      </div>
+      {/* Track label - now clickable for mute toggle */}
+      <button
+        onClick={toggleAudioMute}
+        className={`w-5 h-full flex items-center justify-center rounded-md flex-shrink-0 border transition-all cursor-pointer ${isAudioMuted
+            ? 'bg-gradient-to-b from-magenta-500/40 to-red-500/40 border-magenta-400/60 shadow-[0_0_12px_rgba(255,45,146,0.5)]'
+            : 'bg-gradient-to-b from-magenta-500/20 to-purple-500/20 border-purple-500/30 hover:border-cyan-400/50'
+          }`}
+        title={isAudioMuted ? 'Unmute audio' : 'Mute audio'}
+      >
+        {isAudioMuted ? (
+          <VolumeX className="h-2.5 w-2.5 text-magenta-400" />
+        ) : (
+          <AudioWaveform className="h-2.5 w-2.5 text-cyan-400" />
+        )}
+      </button>
 
       {/* Waveform container with horizontal scroll */}
       <div

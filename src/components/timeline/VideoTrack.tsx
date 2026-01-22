@@ -2,7 +2,7 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { useEditorStore } from '@/lib/store';
 import { Button } from "@/components/ui/button";
-import { Video, GitMerge } from "lucide-react";
+import { Video, GitMerge, X } from "lucide-react";
 import { Transition, MediaClip } from "@/types";
 
 interface VideoTrackProps {
@@ -10,6 +10,7 @@ interface VideoTrackProps {
   dragOverItem: React.MutableRefObject<number | null>;
   handleTimelineDragSort: () => void;
   handleToggleTransition: (clipId: string, currentTransition: Transition | null | undefined) => void;
+  timelineContainerRef: React.RefObject<HTMLDivElement>;
 }
 
 interface ThumbnailCache {
@@ -25,14 +26,20 @@ const VideoTrack: React.FC<VideoTrackProps> = ({
   dragOverItem,
   handleTimelineDragSort,
   handleToggleTransition,
+  timelineContainerRef,
 }) => {
-  const { timelineClips, selectedClip, setSelectedClip, trimmingClipId, setTrimmingClipId, updateClip, timelineZoom } = useEditorStore();
+  const { timelineClips, selectedClip, setSelectedClip, trimmingClipId, setTrimmingClipId, updateClip, timelineZoom, duplicateClip, isExtendMode, removeClip } = useEditorStore();
   const [draggingHandle, setDraggingHandle] = useState<'left' | 'right' | null>(null);
   const dragClipRef = useRef<MediaClip | null>(null);
   const dragStartRef = useRef({ x: 0, startTime: 0, endTime: 0 });
   const [thumbnailCache, setThumbnailCache] = useState<ThumbnailCache>({});
   const generatingThumbnails = useRef<Set<string>>(new Set());
   const lastClipCount = useRef<number>(0);
+
+  // Haptic feedback states
+  const [activeClipId, setActiveClipId] = useState<string | null>(null);
+  const [holdingClipId, setHoldingClipId] = useState<string | null>(null);
+  const holdTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleTrimMouseDown = (e: React.MouseEvent, clip: MediaClip, handle: 'left' | 'right') => {
     e.stopPropagation();
@@ -126,9 +133,15 @@ const VideoTrack: React.FC<VideoTrackProps> = ({
 
       // Generate thumbnails with a small delay to prevent flooding
       clipsNeedingThumbnails.forEach((clip, index) => {
-        setTimeout(() => {
-          generateThumbnail(clip.src, clip.id);
-        }, index * 100); // Stagger thumbnail generation
+        // If clip already has thumbnail data, use it directly
+        if (clip.thumbnail) {
+          setThumbnailCache(prev => ({ ...prev, [clip.id]: clip.thumbnail! }));
+        } else {
+          // Otherwise generate new thumbnail
+          setTimeout(() => {
+            generateThumbnail(clip.src, clip.id);
+          }, index * 100); // Stagger thumbnail generation
+        }
       });
     }
   }, [timelineClips.length, thumbnailCache, generateThumbnail]);
@@ -171,6 +184,29 @@ const VideoTrack: React.FC<VideoTrackProps> = ({
     };
   }, [draggingHandle, updateClip]);
 
+  // Haptic feedback handlers
+  const handleClipMouseDown = (e: React.MouseEvent, clipId: string) => {
+    setActiveClipId(clipId);
+    setHoldingClipId(clipId);
+
+    // Clear any existing timeout
+    if (holdTimeoutRef.current) {
+      clearTimeout(holdTimeoutRef.current);
+    }
+
+    // Set timeout for hold detection (150ms for quick response)
+    holdTimeoutRef.current = setTimeout(() => {
+      setHoldingClipId(null);
+    }, 150);
+  };
+
+  const handleClipMouseUp = () => {
+    if (holdTimeoutRef.current) {
+      clearTimeout(holdTimeoutRef.current);
+    }
+    setHoldingClipId(null);
+  };
+
   const handleDoubleClick = (e: React.MouseEvent, clipId: string) => {
     e.stopPropagation();
     setTrimmingClipId(trimmingClipId === clipId ? null : clipId);
@@ -181,7 +217,11 @@ const VideoTrack: React.FC<VideoTrackProps> = ({
       <div className="w-5 h-full flex items-center justify-center bg-purple-500/10 rounded flex-shrink-0 border border-purple-500/20">
         <Video className="h-2.5 w-2.5 text-cyan-400" />
       </div>
-      <div className="flex-1 h-full flex items-center gap-0.5">
+      <div
+        className="flex-1 h-full flex items-center gap-0"
+        onDragOver={(e) => e.preventDefault()} // Enable drops in container
+        onDrop={(e) => e.preventDefault()}
+      >
         {timelineClips.map((clip, index) => (
           <React.Fragment key={clip.id}>
             {/* Show transition button only if the clip has a transition */}
@@ -199,36 +239,100 @@ const VideoTrack: React.FC<VideoTrackProps> = ({
             )}
             <div
               className="relative h-full flex-shrink-0 group"
-              style={{ width: `${Math.max(MIN_CLIP_WIDTH, ((clip.endTime ?? clip.originalDuration ?? 10) - (clip.startTime ?? 0)) * PIXELS_PER_SECOND_BASE * (timelineZoom / 100))}px` }}
+              style={{
+                width: `${Math.max(MIN_CLIP_WIDTH, ((clip.endTime ?? clip.originalDuration ?? 10) - (clip.startTime ?? 0)) * PIXELS_PER_SECOND_BASE * (timelineZoom / 100)) * (clip.loopCount || 1)}px`
+              }}
             >
               <div
-                className={`w-full h-full rounded-sm relative overflow-hidden cursor-pointer active:cursor-grabbing border-2 ${selectedClip?.id === clip.id && !trimmingClipId ? 'border-primary bg-primary/20' : 'border-muted bg-muted'} hover:bg-primary/10 transition-colors`}
+                className={`
+                  w-full h-full rounded-sm relative overflow-hidden cursor-pointer transition-all duration-150
+                  ${selectedClip?.id === clip.id && !trimmingClipId
+                    ? 'ring-2 ring-cyan-400 ring-offset-2 ring-offset-[#0D0A1A] scale-[1.02] shadow-[0_0_20px_rgba(34,211,238,0.4)]'
+                    : 'border-2 border-muted'
+                  }
+                  ${holdingClipId === clip.id ? 'scale-95 opacity-90' : ''}
+                  hover:ring-1 hover:ring-cyan-500/50 hover:scale-[1.01]
+                  active:cursor-grabbing
+                `}
                 draggable
-                onClick={() => setSelectedClip(clip)}
+                onClick={(e) => {
+                  e.stopPropagation(); // Prevent timeline container from capturing click
+                  setSelectedClip(clip);
+                }}
+                onMouseDown={(e) => handleClipMouseDown(e, clip.id)}
+                onMouseUp={handleClipMouseUp}
+                onMouseLeave={handleClipMouseUp}
                 onDoubleClick={(e) => handleDoubleClick(e, clip.id)}
                 onDragStart={() => (dragItem.current = index)}
                 onDragEnter={() => (dragOverItem.current = index)}
-                onDragEnd={handleTimelineDragSort}
-                onDragOver={(e) => e.stopPropagation()}
+                onDragEnd={(e) => {
+                  // Check if dropped outside timeline
+                  const timelineRect = timelineContainerRef.current?.getBoundingClientRect();
+                  if (timelineRect) {
+                    const { clientX, clientY } = e;
+                    if (
+                      clientX < timelineRect.left || clientX > timelineRect.right ||
+                      clientY < timelineRect.top || clientY > timelineRect.bottom
+                    ) {
+                      // Dropped outside - delete clip
+                      removeClip(clip.id);
+                      dragItem.current = null;
+                      dragOverItem.current = null;
+                      return;
+                    }
+                  }
+                  handleTimelineDragSort();
+                }}
+                onDragOver={(e) => {
+                  e.preventDefault(); // Enable drop
+                  e.stopPropagation();
+                }}
               >
-                {/* Show thumbnail if available, otherwise show video icon */}
-                {thumbnailCache[clip.id] && thumbnailCache[clip.id] !== "data:," ? (
-                  <img
-                    src={thumbnailCache[clip.id]}
-                    alt={clip.file.name}
-                    className="w-full h-full object-cover"
-                    onError={() => {
-                      console.error(`Failed to load thumbnail for clip: ${clip.id}`);
-                      setThumbnailCache(prev => ({ ...prev, [clip.id]: "data:," }));
-                    }}
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-muted/50">
-                    <Video className="h-8 w-8 text-muted-foreground opacity-30" />
+                {/* Render looped thumbnails for X-extend */}
+                {clip.loopCount && clip.loopCount > 1 ? (
+                  <div className="flex h-full w-full">
+                    {Array.from({ length: clip.loopCount }).map((_, i) => (
+                      <div key={i} className="flex-1 h-full relative border-r border-cyan-500/30 last:border-r-0">
+                        {thumbnailCache[clip.id] && thumbnailCache[clip.id] !== "data:," ? (
+                          <img
+                            src={thumbnailCache[clip.id]}
+                            alt={clip.file?.name || 'Video clip'}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-muted/50">
+                            <Video className="h-8 w-8 text-muted-foreground opacity-30" />
+                          </div>
+                        )}
+                        {/* Loop number indicator */}
+                        <span className="absolute top-0 left-0 text-[8px] font-bold text-cyan-400 bg-black/80 px-1 rounded-br-sm border-r border-b border-cyan-500/50">
+                          ×{i + 1}
+                        </span>
+                      </div>
+                    ))}
                   </div>
+                ) : (
+                  /* Show single thumbnail if no loop */
+                  <>
+                    {thumbnailCache[clip.id] && thumbnailCache[clip.id] !== "data:," ? (
+                      <img
+                        src={thumbnailCache[clip.id]}
+                        alt={clip.file?.name || 'Video clip'}
+                        className="w-full h-full object-cover"
+                        onError={() => {
+                          console.error(`Failed to load thumbnail for clip: ${clip.id}`);
+                          setThumbnailCache(prev => ({ ...prev, [clip.id]: "data:," }));
+                        }}
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-muted/50">
+                        <Video className="h-8 w-8 text-muted-foreground opacity-30" />
+                      </div>
+                    )}
+                  </>
                 )}
                 <p className="absolute bottom-0 left-0 text-[10px] text-foreground bg-black/70 px-1 rounded-sm truncate pointer-events-none max-w-full font-medium">
-                  {clip.file.name}
+                  {clip.file?.name || clip.filePath?.split(/[\\/]/).pop() || 'Clip'}
                 </p>
                 {/* Add transition button - only show on hover if no transition exists */}
                 {index > 0 && !clip.transition && (
@@ -249,6 +353,46 @@ const VideoTrack: React.FC<VideoTrackProps> = ({
                     </Button>
                   </div>
                 )}
+
+                {/* Duplicate/Extend controls - show on hover */}
+                <div className="absolute -bottom-7 left-0 right-0 flex justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none group-hover:pointer-events-auto z-30">
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="h-5 w-5 bg-[#0D0A1A]/90 hover:bg-cyan-500/20 border border-cyan-500/30 rounded-sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      duplicateClip(clip.id, 2);
+                    }}
+                    title="Duplicate 2x"
+                  >
+                    <span className="text-[9px] font-bold text-cyan-400">×2</span>
+                  </Button>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="h-5 w-5 bg-[#0D0A1A]/90 hover:bg-cyan-500/20 border border-cyan-500/30 rounded-sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      duplicateClip(clip.id, 3);
+                    }}
+                    title="Duplicate 3x"
+                  >
+                    <span className="text-[9px] font-bold text-cyan-400">×3</span>
+                  </Button>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="h-5 w-5 bg-[#0D0A1A]/90 hover:bg-magenta-500/20 border border-magenta-500/30 rounded-sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      duplicateClip(clip.id, 10); // Extend with 10 copies for "infinite"
+                    }}
+                    title="Extend (10x)"
+                  >
+                    <X className="h-3 w-3 text-magenta-400" />
+                  </Button>
+                </div>
               </div>
               {/* Trimming handles */}
               {trimmingClipId === clip.id && (

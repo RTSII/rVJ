@@ -345,7 +345,7 @@ const VideoPreview = () => {
             )}
           </>
         ) : (
-          <div className="w-full h-full flex items-center justify-center flex-col bg-[#050505] relative group overflow-hidden">
+          <div className="w-full h-full flex items-center justify-center flex-col bg-[#050505] relative group overflow-hidden py-12 px-8">
             {/* Cinematic Screening Placeholder */}
             <div className="absolute inset-0 opacity-10 pointer-events-none">
               <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-cyan-500 to-transparent"></div>
@@ -353,12 +353,12 @@ const VideoPreview = () => {
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.9)_100%)]"></div>
             </div>
 
-            <div className="relative transform transition-transform duration-1000 group-hover:scale-105 z-10">
+            <div className="relative transform transition-transform duration-1000 group-hover:scale-105 z-10 flex items-center justify-center">
               <div className="absolute -inset-16 bg-cyan-500/10 blur-[100px] rounded-full opacity-40 group-hover:opacity-100 transition-opacity duration-1000"></div>
-              <AnimatedLogoSVG size={180} />
+              <AnimatedLogoSVG size={120} />
             </div>
 
-            <div className="text-center z-10 mt-8 space-y-2">
+            <div className="text-center z-10 mt-6 space-y-2">
               <h3 className="text-xs uppercase tracking-[0.5em] font-black text-white/50">Theater Mode</h3>
               <p className="text-[9px] text-cyan-400/60 uppercase tracking-[0.3em] font-mono font-bold animate-pulse">
                 Ready for screening
@@ -369,22 +369,22 @@ const VideoPreview = () => {
       </div>
 
       {/* Cinematic Control Bar */}
-      <div className="px-5 py-2 bg-[#0D0A1A]/95 border-t border-white/5 flex items-center justify-between backdrop-blur-2xl">
+      <div className="px-4 py-2 bg-[#0D0A1A]/95 border-t border-white/5 flex items-center justify-between backdrop-blur-2xl shrink-0">
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon" className="h-7 w-7 text-white/40 hover:text-white/100 hover:bg-white/5" onClick={jumpToStart} title="Jump to project start">
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-white/40 hover:text-white/100 hover:bg-white/5" onClick={jumpToStart} title="Jump to project start">
             <Rewind className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-cyan-400 hover:bg-cyan-500/10" onClick={togglePlay} title="Play/Pause (Space)">
+          <Button variant="ghost" size="icon" className="h-10 w-10 text-cyan-400 hover:bg-cyan-500/10" onClick={togglePlay} title="Play/Pause (Space)">
             {videoIsPlaying ? <Pause className="h-5 w-5 fill-cyan-400" /> : <Play className="h-5 w-5 fill-cyan-400" />}
           </Button>
-          <Button variant="ghost" size="icon" className="h-7 w-7 text-white/40 hover:text-white/100 hover:bg-white/5" onClick={jumpToEnd} title="Jump to clip end">
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-white/40 hover:text-white/100 hover:bg-white/5" onClick={jumpToEnd} title="Jump to clip end">
             <FastForward className="h-4 w-4" />
           </Button>
         </div>
 
-        <div className="flex-1 mx-6 group/progress relative px-2">
+        <div className="flex-1 mx-4 group/progress relative px-2">
           <div
-            className="w-full bg-white/5 h-1 rounded-full cursor-pointer relative overflow-visible"
+            className="w-full bg-white/5 h-1.5 rounded-full cursor-pointer relative overflow-visible"
             onClick={handleProgressBarClick}
           >
             {/* Playback Progress */}
@@ -392,7 +392,7 @@ const VideoPreview = () => {
               className="absolute left-0 top-0 h-full bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full transition-all duration-150"
               style={{ width: `${progressPercentage}%` }}
             >
-              <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 bg-white rounded-full shadow-[0_0_10px_rgba(255,255,255,0.8)] opacity-0 group-hover/progress:opacity-100 transition-opacity"></div>
+              <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full shadow-[0_0_10px_rgba(255,255,255,0.8)] opacity-0 group-hover/progress:opacity-100 transition-opacity"></div>
             </div>
 
             {/* Hover Indicator */}
@@ -400,13 +400,13 @@ const VideoPreview = () => {
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
-            <span className="text-[10px] font-mono font-bold text-cyan-400 bg-cyan-500/5 px-2 py-0.5 rounded border border-cyan-500/10">
+            <span className="text-[10px] font-mono font-bold text-cyan-400 bg-cyan-500/5 px-2 py-0.5 rounded border border-cyan-500/10 whitespace-nowrap">
               {formatTime(currentTime)}
             </span>
             <span className="text-[10px] font-mono text-white/20">/</span>
-            <span className="text-[10px] font-mono text-white/40">
+            <span className="text-[10px] font-mono text-white/40 whitespace-nowrap">
               {formatTime(clipDisplayDuration)}
             </span>
           </div>
@@ -414,12 +414,7 @@ const VideoPreview = () => {
           <div className="h-4 w-[1px] bg-white/10 mx-1"></div>
 
           <div className="flex items-center gap-1">
-            {totalClips > 0 && (
-              <span className="text-[9px] font-bold text-white/30 uppercase tracking-tighter mr-2">
-                Clip {currentClipIndex}<span className="text-white/10 mx-0.5">/</span>{totalClips}
-              </span>
-            )}
-            <Button variant="ghost" size="icon" className="h-7 w-7 text-white/40 hover:text-white/100 hover:bg-white/5" onClick={toggleFullScreen} title="Fullscreen">
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-white/40 hover:text-white/100 hover:bg-white/5" onClick={toggleFullScreen} title="Fullscreen">
               <Expand className="h-4 w-4" />
             </Button>
           </div>

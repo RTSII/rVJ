@@ -11,6 +11,7 @@ export type MediaClip = {
   file?: File; // Optional for backward compatibility
   filePath?: string; // Native filesystem path (Tauri desktop mode)
   assetUrl?: string; // Tauri asset:// URL for playback
+  thumbnail?: string; // Base64 data URL for thumbnail
   startTime?: number;
   endTime?: number;
   originalDuration?: number;
@@ -23,6 +24,7 @@ export type TimelineClip = {
   file?: File; // Optional for backward compatibility
   filePath?: string; // Native filesystem path (Tauri desktop mode)
   assetUrl?: string; // Tauri asset:// URL for playback
+  thumbnail?: string; // Base64 data URL for thumbnail
   startTime?: number;
   endTime?: number;
   originalDuration?: number;
@@ -31,6 +33,7 @@ export type TimelineClip = {
   proxyPath?: string; // Path to low-quality proxy video
   proxyUrl?: string; // asset:// URL for proxy playback
   proxyReady?: boolean; // Whether proxy has been generated
+  loopCount?: number; // 1 = no loop, 2 = X2, 3 = X3, etc.
 };
 
 // Preview quality settings

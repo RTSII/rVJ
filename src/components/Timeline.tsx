@@ -10,6 +10,7 @@ import { FFmpeg } from '@ffmpeg/ffmpeg';
 import { Transition } from "@/types";
 import {
   TimelineControls,
+  ControlsPanel,
   AudioTrack,
   VideoTrack,
   TimelineRuler
@@ -40,6 +41,7 @@ const Timeline = () => {
     absoluteTimelinePosition,
     timelineZoom,
     setTimelineZoom,
+    isAudioMaster,
   } = useEditorStore();
 
   const dragItem = useRef<number | null>(null);
@@ -50,9 +52,14 @@ const Timeline = () => {
 
   // Calculate playhead position based on absolute timeline position
   const getPlayheadPosition = () => {
+    // If audio is loaded and is master, use audio duration for precise sync
+    if (isAudioMaster && duration > 0) {
+      return `${Math.min(100, (absoluteTimelinePosition / duration) * 100)}%`;
+    }
+
+    // Otherwise, calculate from video clips total duration
     if (timelineClips.length === 0) return '0%';
 
-    // Calculate total duration of all clips
     const totalDuration = timelineClips.reduce((acc, clip) => {
       const clipDuration = (clip.endTime ?? clip.originalDuration ?? 0) - (clip.startTime ?? 0);
       return acc + clipDuration;
@@ -285,16 +292,26 @@ const Timeline = () => {
 
   const playheadPosition = getPlayheadPosition();
 
+  // Get isAudioMuted to apply to audio element
+  const { isAudioMuted } = useEditorStore();
+
+  // Apply mute to audio element
+  React.useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.muted = isAudioMuted;
+    }
+  }, [isAudioMuted, audioRef]);
+
   return (
     <Card className="flex flex-col h-full bg-card/50 border border-border/50 shadow-sm overflow-hidden">
       {audioSrc && <audio ref={audioRef} src={audioSrc} />}
-      <TimelineControls handleExport={handleExport} />
-      <CardContent className="p-2 pt-1 flex-1 min-h-0 overflow-hidden flex flex-col">
+      <ControlsPanel handleExport={handleExport} />
+      <CardContent className="p-1 pt-0 flex-1 min-h-0 overflow-hidden flex flex-col">
         {isExporting && (
-          <div className="mb-2 p-2 bg-secondary/20 border border-border/30 rounded-lg space-y-1">
-            <p className="text-sm text-foreground font-medium text-center">Exporting Video...</p>
-            <Progress value={exportProgress} className="w-full h-2" />
-            <p className="text-xs text-muted-foreground text-center">{Math.round(exportProgress)}% complete</p>
+          <div className="mb-1 p-1.5 bg-secondary/20 border border-border/30 rounded-lg space-y-1">
+            <p className="text-xs text-foreground font-medium text-center">Exporting Video...</p>
+            <Progress value={exportProgress} className="w-full h-1.5" />
+            <p className="text-[10px] text-muted-foreground text-center">{Math.round(exportProgress)}% complete</p>
           </div>
         )}
         <div
@@ -304,27 +321,20 @@ const Timeline = () => {
           onClick={handleTimelineClick}
           ref={timelineContainerRef}
         >
-          <TimelineRuler />
-
-          {/* Enhanced playhead with scrubbing capability */}
-          <div
-            className="absolute top-4 bottom-0 w-0.5 bg-primary z-30 shadow-lg cursor-ew-resize"
-            style={{ left: playheadPosition }}
-            onMouseDown={handleProgressBarMouseDown}
-          >
-            <div className="h-2 w-2 rounded-full bg-primary border-2 border-background absolute -top-1 -translate-x-1/2 shadow-lg cursor-grab active:cursor-grabbing"></div>
-            <div className="absolute top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary via-primary/80 to-primary/60"></div>
-          </div>
-
-          {/* Tracks - Video clips ABOVE audio waveform - with proper overflow */}
-          <div className="flex-1 min-h-0 overflow-y-hidden overflow-x-auto px-2 pb-1">
-            <div className="space-y-1 mt-1">
+          {/* Tracks layout: Video clips → Time Ruler (with playhead) → Audio waveform */}
+          <div className="flex-1 min-h-0 overflow-y-hidden overflow-x-auto px-1">
+            <div className="space-y-0.5 h-full flex flex-col justify-end pb-1">
+              {/* Video Track */}
               <VideoTrack
                 dragItem={dragItem}
                 dragOverItem={dragOverItem}
                 handleTimelineDragSort={handleTimelineDragSort}
                 handleToggleTransition={handleToggleTransition}
+                timelineContainerRef={timelineContainerRef}
               />
+              {/* Time ruler with integrated playhead between video and audio */}
+              <TimelineRuler />
+              {/* Audio Track */}
               <AudioTrack duration={duration} setDraggingMarkerIndex={setDraggingMarkerIndex} />
             </div>
           </div>

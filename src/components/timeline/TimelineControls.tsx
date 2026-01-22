@@ -1,8 +1,9 @@
 
 import React from 'react';
 import { Button } from "@/components/ui/button";
-import { Plus, Minus, Download, Loader2, MapPin } from "lucide-react";
+import { Plus, Minus, Download, Loader2, MapPin, SkipBack, X, Play, Pause } from "lucide-react";
 import { useEditorStore } from '@/lib/store';
+import { useEditor } from '@/context/EditorContext';
 
 interface TimelineControlsProps {
   handleExport: () => void;
@@ -19,6 +20,7 @@ const formatTimecode = (seconds: number): string => {
 };
 
 const TimelineControls: React.FC<TimelineControlsProps> = ({ handleExport }) => {
+  const { togglePlay } = useEditor();
   const {
     isExporting,
     exportProgress,
@@ -27,7 +29,11 @@ const TimelineControls: React.FC<TimelineControlsProps> = ({ handleExport }) => 
     duration,
     timelineZoom,
     zoomIn,
-    zoomOut
+    zoomOut,
+    isExtendMode,
+    setExtendMode,
+    resetToTimelineStart,
+    isPlaying
   } = useEditorStore();
 
   // Calculate zoom slider position (10-500 mapped to 0-100%)
@@ -60,13 +66,40 @@ const TimelineControls: React.FC<TimelineControlsProps> = ({ handleExport }) => 
           )}
           {isExporting ? `Exporting... ${exportProgress}%` : "Export"}
         </Button>
+        <Button
+          variant={isExtendMode ? "default" : "ghost"}
+          size="icon"
+          className={`h-7 w-7 ${isExtendMode ? 'bg-magenta-500/30 text-magenta-400 shadow-[0_0_15px_rgba(236,72,153,0.3)]' : 'text-muted-foreground hover:bg-magenta-500/20'}`}
+          onClick={() => setExtendMode(!isExtendMode)}
+          title="Toggle Extend Mode (X2/X3 clip duplication)"
+        >
+          <X className="h-4 w-4" />
+        </Button>
       </div>
 
-      {/* Center - Timecode display */}
+      {/* Center - Rewind + Timecode display */}
       <div className="flex items-center gap-2">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-7 w-7 text-cyan-400 hover:bg-cyan-500/20"
+          onClick={resetToTimelineStart}
+          title="Rewind to beginning"
+        >
+          <SkipBack className="h-4 w-4" />
+        </Button>
         <span className="text-sm font-mono text-cyan-400 bg-[#0D0A1A]/80 px-3 py-1 rounded-md border border-cyan-500/30">
           {formatTimecode(duration)}
         </span>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-7 w-7 text-cyan-400 hover:bg-cyan-500/20"
+          onClick={togglePlay}
+          title={isPlaying ? "Pause" : "Play"}
+        >
+          {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+        </Button>
       </div>
 
       {/* Right controls - Zoom */}

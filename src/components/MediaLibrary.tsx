@@ -13,7 +13,7 @@ const MediaLibrary = () => {
   const audioInputRef = useRef<HTMLInputElement>(null);
   const dragItem = useRef<number | null>(null);
   const dragOverItem = useRef<number | null>(null);
-  const { addClipToTimeline, loadAudio, setSelectedClip } = useEditorStore();
+  const { addClipToTimeline, loadAudio, setSelectedClip, timelineClips } = useEditorStore();
 
   // Generate thumbnail - uses native FFmpeg in desktop mode, canvas in browser
   const generateThumbnail = async (clip: MediaClip): Promise<string> => {
@@ -70,18 +70,27 @@ const MediaLibrary = () => {
     });
   };
 
-  // Generate thumbnails for new clips
+  // Generate thumbnails for new clips and store in clip data
   useEffect(() => {
-    mediaClips.forEach(async (clip) => {
-      if (!thumbnailCache[clip.id] && !loadingThumbnails.has(clip.id)) {
+    mediaClips.forEach(async (clip, index) => {
+      if (!clip.thumbnail && !thumbnailCache[clip.id] && !loadingThumbnails.has(clip.id)) {
         setLoadingThumbnails(prev => new Set(prev).add(clip.id));
         const thumbnail = await generateThumbnail(clip);
+
+        // Store in both cache (for display) and clip data (for timeline)
         setThumbnailCache(prev => ({ ...prev, [clip.id]: thumbnail }));
+        setMediaClips(prev => prev.map((c, i) =>
+          i === index ? { ...c, thumbnail } : c
+        ));
+
         setLoadingThumbnails(prev => {
           const next = new Set(prev);
           next.delete(clip.id);
           return next;
         });
+      } else if (clip.thumbnail && !thumbnailCache[clip.id]) {
+        // If clip has thumbnail but cache doesn't, populate cache
+        setThumbnailCache(prev => ({ ...prev, [clip.id]: clip.thumbnail! }));
       }
     });
   }, [mediaClips]);
@@ -239,6 +248,14 @@ const MediaLibrary = () => {
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors rounded flex items-center justify-center">
                     <Plus className="h-6 w-6 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
                   </div>
+                  {/* Status indicator - frosted glass (default) or neon magenta (in timeline) */}
+                  <div
+                    className={`absolute top-1 right-1 w-3 h-3 rounded-full border transition-all duration-300 ${timelineClips.some(tc => tc.src === clip.src)
+                      ? 'bg-[#ff00ff] border-[#ff66ff] shadow-[0_0_8px_#ff00ff]'
+                      : 'bg-white/20 backdrop-blur-sm border-white/40'
+                      }`}
+                    title={timelineClips.some(tc => tc.src === clip.src) ? "In timeline" : "Not added"}
+                  />
                 </div>
               ))}
             </div>
