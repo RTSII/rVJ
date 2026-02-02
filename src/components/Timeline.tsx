@@ -11,7 +11,7 @@ import { Transition } from "@/types";
 import {
   TimelineControls,
   ControlsPanel,
-  AudioTrack,
+  WavesurferAudioTrack,
   VideoTrack,
   TimelineRuler
 } from './timeline/index';
@@ -334,8 +334,8 @@ const Timeline = () => {
               />
               {/* Time ruler with integrated playhead between video and audio */}
               <TimelineRuler />
-              {/* Audio Track */}
-              <AudioTrack duration={duration} setDraggingMarkerIndex={setDraggingMarkerIndex} />
+              {/* Audio Track - Wavesurfer.js */}
+              <WavesurferAudioTrack />
             </div>
           </div>
         </div>

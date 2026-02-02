@@ -151,8 +151,8 @@ const Index = () => {
 
           {/* Main Content Area */}
           <div className="flex-1 flex flex-col overflow-hidden">
-            {/* Top Workspace - Theater View centered - 36% height */}
-            <div className="h-[36%] p-4 min-h-[220px] overflow-hidden bg-black/40 relative flex items-center justify-center">
+            {/* Top Workspace - Theater View - dynamic height with max constraint */}
+            <div className="p-2 pb-0 overflow-hidden bg-black/40 relative flex items-center justify-center" style={{ maxHeight: '42vh', minHeight: '180px' }}>
               {/* Theater Ambient Light Effects */}
               <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-20">
                 <div className="absolute -top-[50%] left-1/4 w-[50%] h-[100%] bg-cyan-500/20 blur-[120px] rounded-full animate-pulse-slow"></div>
@@ -172,8 +172,8 @@ const Index = () => {
               </div>
             </div>
 
-            {/* Bottom Workspace - Timeline - Balanced and constrained to remove scrollbar */}
-            <div className="flex-1 border-t border-purple-500/30 bg-gradient-to-b from-[#151022]/80 to-[#0D0A1A]/80 backdrop-blur-sm overflow-hidden flex flex-col">
+            {/* Bottom Workspace - Timeline - takes remaining space, no vertical scroll */}
+            <div className="flex-1 min-h-[200px] border-t border-purple-500/30 bg-gradient-to-b from-[#151022]/80 to-[#0D0A1A]/80 backdrop-blur-sm overflow-hidden flex flex-col">
               <Timeline />
             </div>
           </div>

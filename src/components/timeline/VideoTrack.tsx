@@ -213,7 +213,7 @@ const VideoTrack: React.FC<VideoTrackProps> = ({
   }
 
   return (
-    <div className="h-14 bg-[#151022]/40 rounded-lg p-1 flex items-center gap-1 border border-purple-500/10">
+    <div className="h-16 bg-[#151022]/40 rounded-lg p-1 flex items-center gap-1 border border-purple-500/10">
       <div className="w-5 h-full flex items-center justify-center bg-purple-500/10 rounded flex-shrink-0 border border-purple-500/20">
         <Video className="h-2.5 w-2.5 text-cyan-400" />
       </div>

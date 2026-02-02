@@ -4,10 +4,11 @@ import { UploadCloud, Plus, Music, Video } from "lucide-react";
 import React, { useState, useRef, useEffect } from "react";
 import { useEditorStore } from "@/lib/store";
 import { MediaClip } from "@/types";
+import { thumbnailCache } from "@/lib/thumbnailCache";
 
 const MediaLibrary = () => {
   const [mediaClips, setMediaClips] = useState<MediaClip[]>([]);
-  const [thumbnailCache, setThumbnailCache] = useState<Record<string, string>>({});
+  const [thumbnailCacheState, setThumbnailCacheState] = useState<Record<string, string>>({});
   const [loadingThumbnails, setLoadingThumbnails] = useState<Set<string>>(new Set());
   const videoInputRef = useRef<HTMLInputElement>(null);
   const audioInputRef = useRef<HTMLInputElement>(null);
@@ -17,6 +18,13 @@ const MediaLibrary = () => {
 
   // Generate thumbnail - uses native FFmpeg in desktop mode, canvas in browser
   const generateThumbnail = async (clip: MediaClip): Promise<string> => {
+    // Check persistent cache first
+    const cachedThumbnail = await thumbnailCache.get(clip.filePath || clip.src);
+    if (cachedThumbnail) {
+      console.log('✅ Using cached thumbnail for:', clip.filePath || clip.src);
+      return cachedThumbnail;
+    }
+
     const isTauri = typeof window !== 'undefined' && '__TAURI__' in window;
 
     // Desktop mode: use native FFmpeg for reliable thumbnail extraction
@@ -24,7 +32,11 @@ const MediaLibrary = () => {
       try {
         const { generateNativeThumbnail } = await import('@/lib/desktop');
         const thumbnail = await generateNativeThumbnail(clip.filePath, 0.5);
-        if (thumbnail) return thumbnail;
+        if (thumbnail) {
+          // Cache the thumbnail
+          await thumbnailCache.set(clip.filePath, thumbnail);
+          return thumbnail;
+        }
       } catch (error) {
         console.error('Native thumbnail failed, falling back to canvas:', error);
       }
@@ -46,7 +58,7 @@ const MediaLibrary = () => {
         video.currentTime = Math.min(0.1, video.duration / 10);
       };
 
-      video.onseeked = () => {
+      video.onseeked = async () => {
         clearTimeout(timeout);
         const canvas = document.createElement('canvas');
         canvas.width = 160;
@@ -56,6 +68,10 @@ const MediaLibrary = () => {
         if (ctx && video.videoWidth > 0) {
           ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
           const thumbnailUrl = canvas.toDataURL('image/jpeg', 0.85);
+
+          // Cache the thumbnail
+          await thumbnailCache.set(clip.src, thumbnailUrl);
+
           resolve(thumbnailUrl);
         } else {
           resolve("data:,");
@@ -73,12 +89,12 @@ const MediaLibrary = () => {
   // Generate thumbnails for new clips and store in clip data
   useEffect(() => {
     mediaClips.forEach(async (clip, index) => {
-      if (!clip.thumbnail && !thumbnailCache[clip.id] && !loadingThumbnails.has(clip.id)) {
+      if (!clip.thumbnail && !thumbnailCacheState[clip.id] && !loadingThumbnails.has(clip.id)) {
         setLoadingThumbnails(prev => new Set(prev).add(clip.id));
         const thumbnail = await generateThumbnail(clip);
 
         // Store in both cache (for display) and clip data (for timeline)
-        setThumbnailCache(prev => ({ ...prev, [clip.id]: thumbnail }));
+        setThumbnailCacheState(prev => ({ ...prev, [clip.id]: thumbnail }));
         setMediaClips(prev => prev.map((c, i) =>
           i === index ? { ...c, thumbnail } : c
         ));
@@ -88,12 +104,21 @@ const MediaLibrary = () => {
           next.delete(clip.id);
           return next;
         });
-      } else if (clip.thumbnail && !thumbnailCache[clip.id]) {
+      } else if (clip.thumbnail && !thumbnailCacheState[clip.id]) {
         // If clip has thumbnail but cache doesn't, populate cache
-        setThumbnailCache(prev => ({ ...prev, [clip.id]: clip.thumbnail! }));
+        setThumbnailCacheState(prev => ({ ...prev, [clip.id]: clip.thumbnail! }));
       }
     });
   }, [mediaClips]);
+
+  // Run cleanup on mount to remove old thumbnails
+  useEffect(() => {
+    thumbnailCache.cleanup().then(deletedCount => {
+      if (deletedCount > 0) {
+        console.log(`🗑️ Cleaned up ${deletedCount} old thumbnails from cache`);
+      }
+    });
+  }, []);
 
 
   const handleUploadVideoClick = async () => {
@@ -234,9 +259,9 @@ const MediaLibrary = () => {
                   onDragEnd={handleDragSort}
                   onDragOver={(e) => e.preventDefault()}
                 >
-                  {thumbnailCache[clip.id] && thumbnailCache[clip.id] !== "data:," ? (
+                  {thumbnailCacheState[clip.id] && thumbnailCacheState[clip.id] !== "data:," ? (
                     <img
-                      src={thumbnailCache[clip.id]}
+                      src={thumbnailCacheState[clip.id]}
                       alt="Video thumbnail"
                       className="w-full h-full object-cover rounded"
                     />

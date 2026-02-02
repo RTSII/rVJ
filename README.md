@@ -146,10 +146,9 @@ rVJ/
 **Alpha Launch Successful** - The desktop conversion is functional with:
 - ✅ **New rVJ Branding**: Custom logo integrated into app and installer
 - ✅ **Native file dialogs** for video/audio selection
-- ✅ **Real waveform generation** from audio files
-- ✅ **Native FFmpeg thumbnail extraction**
-- ✅ **Native FFmpeg video export**
-- ✅ **Zero-buffering playback** via `asset://` protocol (2hr+ supported)
+- ✅ **Professional Wavesurfer.js** visualization with neon styling
+- ✅ **Real-time Memory Monitoring** and crash protection
+- ✅ **Persistent Thumbnail Caching** via IndexedDB
 - ✅ **Full Tauri 2.0 Security Migration**: Verified capabilities/permissions
 
 **Next Steps** (see `DESKTOP-TODO.md`):
